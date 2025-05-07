@@ -219,7 +219,7 @@ int main(int argc, char **argv){
                 case_k->i_q = fgetc(fptr);//tableau de quantification
 
                 infos_img[k] = case_k;
-                break;
+                
 
             }
 
@@ -251,13 +251,29 @@ int main(int argc, char **argv){
         }
     fclose(fptr);
     for (int u=0;u< tab_q_traite; u++){
-        if (tables[i]){
-            free(tables[i]->data);
-            free(tables[i]);
+        if (tables[u]){
+            free(tables[u]->data);
+            free(tables[u]);
+        }
+        else{
+            break;
         }
     }
     free(tables);
+    for(i=0;i<4;i++){
+        if (huff_ac[i] ){
+            free(huff_ac[i]);
+        }
+        if (huff_dc[i]){
+            free(huff_dc[i]);
+        }
+    }
     free(huff_ac);
     free(huff_dc);
+    for (int k=0;k<N_comp;k++){
+        free(infos_img[k]);
+    }
+    free(infos_img[k]);
+    free(sos_table);
     //à compléter
     return 0;}
