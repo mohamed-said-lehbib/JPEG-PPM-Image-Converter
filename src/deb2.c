@@ -73,8 +73,8 @@ int main(int argc, char **argv){
             int dqt_b = fgetc(fptr);
             int dqt_s = fgetc(fptr);
             int taille_dqt = 256*dqt_b +dqt_s;
-           
-          
+        
+        
             
             int j = 0;
             while(j<taille_dqt - 2){//lorsqu'il y ancore des tables à traiter
@@ -82,7 +82,7 @@ int main(int argc, char **argv){
                 uint8_t inter = fgetc(fptr);
                 uint8_t prec = (inter & 0xF0)>>4; //précision
                 uint8_t indi = inter & 0x0F;  //indice
-                 
+                
                 quantification_table *quan_ptr = malloc(sizeof(quantification_table));
                 quan_ptr->prec =prec;
                 quan_ptr->i_q = indi;
@@ -125,11 +125,11 @@ int main(int argc, char **argv){
             uint16_t len1 = fgetc(fptr);
             uint16_t len2 = fgetc(fptr);
             uint16_t len_huff = (len1<<8) + len2;
- 
+
             
             int j=0;
             while( j <len_huff -2){
-                 //trouver les informatons supplémentaires
+                //trouver les informatons supplémentaires
                 uint16_t info = fgetc(fptr);
                 uint8_t type_huff = info & 0x10;
                 uint8_t index_huff = info & 0x0F;
@@ -175,7 +175,52 @@ int main(int argc, char **argv){
             
         }
         else if(flag == 0xc0){//SOF0
+            //longuer
+            uint16_t len_sofb = fgetc(fptr);//octet de poids fort
+            uint16_t len_sofs = fgetc(fptr);//octet de poids faible
+            uint16_t taille_sofo = (len_sofb<<8) + len_sofs;
 
+            //précision
+            uint8_t prec_sof = fgetc(fptr);
+
+            //hauteur et largeur
+            uint16_t haut_h = fgetc(fptr);
+            uint16_t haut_b = fgetc(fptr);
+            uint16_t hauteur = (haut_h<<8) + haut_b;
+
+            uint16_t lar_h = fgetc(fptr);
+            uint16_t lar_b = fgetc(fptr);
+            uint16_t largeur = (lar_h<<8) + lar_b;
+
+            //Nombre de composantes N
+            uint8_t N_comp = fgetc(fptr);
+            typedef struct {
+                uint8_t i_c;
+                uint8_t h_i;
+                uint8_t v_i;
+                uint8_t i_q;//table de quantification
+            } infos_comp;
+            infos_comp **infos_img = malloc(N_comp*sizeof(infos_comp));
+            for(int k=0;k<N_comp;k++){
+                infos_comp* case_k=malloc(sizeof(infos_comp));
+                uint8_t i_c = fgetc(fptr);
+                case_k->i_c = i_c;
+                uint8_t ech_fact =  fgetc(fptr);//facteur d'échantillonage
+                case_k->h_i = (ech_fact>>4);
+                case_k->v_i = (ech_fact & 0x0F);
+                case_k->i_q = fgetc(fptr);//tableau de quantification
+
+                infos_img[k] = case_k;
+
+
+            }
+
+        }
+        else if(flag == 0xda){//SOS
+
+        }
+        else if(flag == 0xd9){//EOI
+            break;//fin de ecture
         }
         byte = fgetc(fptr); //avancer vers le ff
         }
