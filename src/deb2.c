@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 
+
 int main(int argc, char **argv){
     if( argc != 2){
         return 1;
@@ -40,7 +41,13 @@ int main(int argc, char **argv){
     uint8_t ac = 0;//nombre de tables ac
 
     uint8_t dc = 0;//nombre de tables dc
-    while((byte == 0xff)){//while True
+    typedef struct{
+        uint8_t i_c;
+        uint8_t i_ac;
+        uint8_t i_dc;
+
+    } SOS_val;
+    while((byte == 0xff)){//while pas de données brutes
         
         unsigned char flag = fgetc(fptr);
         
@@ -164,6 +171,7 @@ int main(int argc, char **argv){
                     for(int k=0;k<n_symb;k++ ){
                         symbols[k] = fgetc(fptr);
                     }
+                    printf("symbols : ");
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
                     coll->lengths = table_longuer;
                     coll->symboles = symbols;
@@ -211,12 +219,29 @@ int main(int argc, char **argv){
                 case_k->i_q = fgetc(fptr);//tableau de quantification
 
                 infos_img[k] = case_k;
-
+                break;
 
             }
 
         }
         else if(flag == 0xda){//SOS
+            //longeur de section non brute
+            uint16_t len_sos_b = fgetc(fptr);
+            uint16_t len_sos_f = fgetc(fptr);
+            uint16_t len_sos = (len_sos_b<<8) + len_sos_f;
+            //nombre de composante sos
+            uint8_t N_comp_sos = fgetc(fptr);
+            
+            SOS_val **sos_table = malloc(N_comp_sos*sizeof(SOS_val *));
+            for(int k=0;k<N_comp_sos;k++){
+                uint8_t i_c = fgetc(fptr);
+                uint8_t ac_dc = fgetc(fptr);
+                SOS_val *SH = malloc(sizeof(SOS_val));
+                SH->i_c = i_c;
+                SH->i_dc = (ac_dc >> 4);
+                SH->i_ac = (ac_dc & 0x0F);
+                sos_table[k] = SH;
+            }
 
         }
         else if(flag == 0xd9){//EOI
