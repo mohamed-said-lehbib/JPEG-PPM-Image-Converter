@@ -2,57 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-/*void **get_head(const char *fich){
-    
-    FILE *fptr = fopen(fich,"rb");
-    int i = 0;
-    //SOI
-    fgetc(fptr);
-    fgetc(fptr); //avancer de deux octets 
-    int byte; // tous les fichiers jpeg finissent par SOI et EOI
-    while((byte= fget(fptr) != EOF)){
-        
-    }
-    //APP0 
-     
-    fgetc(fptr);
-    fgetc(fptr);
 
-    //taille de la section
-    int o_fort = fgetc(fptr);
-    int o_faible = fgetc(fptr);
-    size_t n= o_fort*256 + o_faible; 
-
-    //lecture de type
-    unsigned char l1 = fgetc(fptr);
-    unsigned char l2 = fgetc(fptr);
-    unsigned char l3 = fgetc(fptr);
-    unsigned char l4 = fgetc(fptr);
-    unsigned char l5 = fgetc(fptr);
-    unsigned char *typ = (l1,l2,l3,l4,l5);
-    //00 01
-    fgetc(fptr);
-    fgetc(fptr);
-
-    //octets à ignorer
-    int i;
-    for(i=0;i<7;i++){fgetc(fptr);}
-    //COM
-
-    
-    
-    
-    unsigned char by;
-    unsigned *bytes = malloc(n*sizeof(int)); //
-    for(i = 0;i<n;i++){
-         //avancer d'un pas et voir si c'est la limite
-         by = fgetc(fptr);
-         bytes[i] = by;
-        
-        
-    }
-    return bytes;
-}*/
 int main(int argc, char **argv){
     if( argc != 2){
         return 1;
@@ -78,7 +28,7 @@ int main(int argc, char **argv){
     structure pour stocker les tableaux de différents tailles*/
 
 
-    uint8_t tab_q_traite =0; 
+    
     quantification_table **tables = malloc( 4* sizeof(quantification_table *)); //4 tableaux au maximum
     
     typedef struct{
@@ -224,8 +174,20 @@ int main(int argc, char **argv){
             }
             
         }
+        else if(flag == 0xc0){//SOF0
+
+        }
         byte = fgetc(fptr); //avancer vers le ff
         }
     fclose(fptr);
-    
+    for (int u=0;u< tab_q_traite; u++){
+        if (tables[i]){
+            free(tables[i]->data);
+            free(tables[i]);
+        }
+    }
+    free(tables);
+    free(huff_ac);
+    free(huff_dc);
+    //à compléter
     return 0;}
