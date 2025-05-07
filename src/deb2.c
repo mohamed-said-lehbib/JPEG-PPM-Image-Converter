@@ -62,7 +62,7 @@ int main(int argc, char **argv){
     while((byte == 0xff)){//while pas de données brutes
         
         unsigned char flag = fgetc(fptr);
-        
+        printf("byte , flag = %d,%x\n",byte,flag);
         if(flag == 0xe0){ //APP0 
             //taille de la section
             int o_fort = fgetc(fptr);
@@ -76,7 +76,8 @@ int main(int argc, char **argv){
             unsigned char l4 = fgetc(fptr);
             unsigned char l5 = fgetc(fptr);
             unsigned char typ[5] = {l1,l2,l3,l4,l5};
-            for(int j=8;j< taille_app;j++){
+            printf("type: %s\n",typ);
+            for(int j=7;j< taille_app;j++){
                 fgetc(fptr);
             }
         }
@@ -111,7 +112,7 @@ int main(int argc, char **argv){
                     uint8_t *quan_table = malloc(64*sizeof(uint8_t));
                     for(int k =0;k<64;k ++){
                         quan_table[k] = fgetc(fptr);
-                        printf("quan_table[k] : %d",quan_table[k]); 
+                        printf("quan_table[%d] : %d\n",k,quan_table[k]); 
                     }
                     quan_ptr->data = quan_table;
                     j+= 65;
@@ -164,6 +165,7 @@ int main(int argc, char **argv){
                     uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
                     for(int k=0;k<n_symb;k++ ){
                         symbols[k] = fgetc(fptr);
+                        printf("symb %d:%d\n",k,symbols[k]);
                     }
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
                     coll->lengths = table_longuer;
@@ -183,8 +185,9 @@ int main(int argc, char **argv){
                     uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
                     for(int k=0;k<n_symb;k++ ){
                         symbols[k] = fgetc(fptr);
+                        printf("symb %d:%d\n",k,symbols[k]);
                     }
-                    printf("symbols : ");
+                    
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
                     coll->lengths = table_longuer;
                     coll->symboles = symbols;
@@ -250,12 +253,13 @@ int main(int argc, char **argv){
                 SH->i_ac = (ac_dc & 0x0F);
                 sos_table[k] = SH;
             }
-
+            break;
         }
         else if(flag == 0xd9){//EOI
             break;//fin de ecture
         }
         byte = fgetc(fptr); //avancer vers le ff
+        printf("end : %x\n",byte);
         }
     fclose(fptr);
     for (int u=0;u< tab_q_traite; u++){
@@ -270,9 +274,13 @@ int main(int argc, char **argv){
     free(tables);
     for(i=0;i<4;i++){
         if (huff_ac[i] ){
+            free(huff_ac[i]->lengths);
+            free(huff_ac[i]->symboles);
             free(huff_ac[i]);
         }
         if (huff_dc[i]){
+            free(huff_dc[i]->lengths);
+            free(huff_dc[i]->symboles);
             free(huff_dc[i]);
         }
     }
