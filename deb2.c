@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-void **get_head(const char *fich){
+/*void **get_head(const char *fich){
     
     FILE *fptr = fopen(fich,"rb");
     int i = 0;
@@ -45,14 +45,14 @@ void **get_head(const char *fich){
     unsigned char by;
     unsigned *bytes = malloc(n*sizeof(int)); //
     for(i = 0;i<n;i++){
-         /*avancer d'un pas et voir si c'est la limite*/
+         //avancer d'un pas et voir si c'est la limite
          by = fgetc(fptr);
          bytes[i] = by;
         
         
     }
     return bytes;
-}
+}*/
 int main(int argc, char **argv){
     if( argc != 2){
         return 1;
@@ -71,17 +71,30 @@ int main(int argc, char **argv){
     unsigned char byte = fgetc(fptr);
     typedef struct {
         uint8_t prec;//pour se souvenir de typpe de table
-        uint8_t ind;
+        uint8_t i_q;
         void *data;
     } quantification_table;
     uint8_t tab_q_traite =0; /*
     structure pour stocker les tableaux de différents tailles*/
+
+
+    uint8_t tab_q_traite =0; 
     quantification_table **tables = malloc( 4* sizeof(quantification_table *)); //4 tableaux au maximum
+    
+    typedef struct{
+        uint8_t *lengths;
+        uint8_t* symboles;
+    } huff_tbl;
+    huff_tbl **huff_ac= malloc(4*sizeof(huff_tbl *));
+    huff_tbl **huff_dc= malloc(4*sizeof(huff_tbl *));
+    uint8_t ac = 0;//nombre de tables ac
+
+    uint8_t dc = 0;//nombre de tables dc
     while((byte == 0xff)){//while True
         
         unsigned char flag = fgetc(fptr);
         
-        if(flag == 0xe0){ //APPx 
+        if(flag == 0xe0){ //APP0 
             //taille de la section
             int o_fort = fgetc(fptr);
             int o_faible = fgetc(fptr);
@@ -122,7 +135,7 @@ int main(int argc, char **argv){
                  
                 quantification_table *quan_ptr = malloc(sizeof(quantification_table));
                 quan_ptr->prec =prec;
-                quan_ptr->ind = indi;
+                quan_ptr->i_q = indi;
 
                 if(prec == 0){//donc tableaux à 8 bits 
                     
@@ -158,7 +171,57 @@ int main(int argc, char **argv){
             }
 
             }
-        else if(flag == 0xc0){
+        else if(flag == 0xc4){//Define Huffman table
+            uint16_t len1 = fgetc(fptr);
+            uint16_t len2 = fgetc(fptr);
+            uint16_t len_huff = (len1<<8) + len2;
+ 
+            
+            int j=0;
+            while( j <len_huff -2){
+                 //trouver les informatons supplémentaires
+                uint16_t info = fgetc(fptr);
+                uint8_t type_huff = info & 0x10;
+                uint8_t index_huff = info & 0x0F;
+
+                if (type_huff == 0){ //DC
+                    uint8_t *table_longuer = malloc(16*sizeof(uint8_t));//16 longouer et 16 c   ractères au maximum
+                    int n_symb = 0;//nombre des symboles
+                    for (int k=0;k<16;k++){
+                        table_longuer[k] = fgetc(fptr);
+                        n_symb += table_longuer[k];
+                    }
+                    uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
+                    for(int k=0;k<n_symb;k++ ){
+                        symbols[k] = fgetc(fptr);
+                    }
+                    huff_tbl *coll = malloc(sizeof(huff_tbl));
+                    coll->lengths = table_longuer;
+                    coll->symboles = symbols;
+                    huff_dc[dc] = coll;
+                    dc++;//dc = indice de prochain table s'il existe
+                    j +=  1 + 16 + n_symb;
+                    
+                }
+                else { //AC
+                    uint8_t *table_longuer = malloc(16*sizeof(uint8_t));//16 longouer et 16 c   ractères au maximum
+                    int n_symb = 0;//nombre des symboles
+                    for (int k=0;k<16;k++){
+                        table_longuer[k] = fgetc(fptr);
+                        n_symb += table_longuer[k];
+                    }
+                    uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
+                    for(int k=0;k<n_symb;k++ ){
+                        symbols[k] = fgetc(fptr);
+                    }
+                    huff_tbl *coll = malloc(sizeof(huff_tbl));
+                    coll->lengths = table_longuer;
+                    coll->symboles = symbols;
+                    huff_ac[ac] = coll;
+                    ac++;//ac = indice de prochain table s'il existe
+                    j += 1 + 16 + n_symb;
+                }
+            }
             
         }
         byte = fgetc(fptr); //avancer vers le ff
