@@ -175,9 +175,23 @@ int main(int argc, char **argv){
             
         }
         else if(flag == 0xc0){//SOF0
+            //longuer
             uint16_t len_sofb = fgetc(fptr);//octet de poids fort
             uint16_t len_sofs = fgetc(fptr);//octet de poids faible
             uint16_t taille_sofo = (len_sofb<<8) + len_sofs;
+
+            //précision
+            uint8_t prec_sof = fgetc(fptr);
+
+            //hauteur et largeur
+            uint16_t haut_h = fgetc(fptr);
+            uint16_t haut_b = fgetc(fptr);
+            uint16_t hauteur = (haut_h<<8) + haut_b;
+
+            uint16_t lar_h = fgetc(fptr);
+            uint16_t lar_b = fgetc(fptr);
+            uint16_t largeur = (lar_h<<8) + lar_b;
+
         }
         byte = fgetc(fptr); //avancer vers le ff
         }
