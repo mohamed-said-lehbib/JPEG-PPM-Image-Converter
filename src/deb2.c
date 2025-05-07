@@ -47,6 +47,18 @@ int main(int argc, char **argv){
         uint8_t i_dc;
 
     } SOS_val;
+    typedef struct {
+        uint8_t i_c;
+        uint8_t h_i;
+        uint8_t v_i;
+        uint8_t i_q;//table de quantification
+    } infos_comp;
+    infos_comp **infos_img =NULL;
+    int N_comp = 0;
+    SOS_val **sos_table = NULL;
+    uint16_t hauteur =0 ;
+    uint16_t largeir= 0;
+
     while((byte == 0xff)){//while pas de données brutes
         
         unsigned char flag = fgetc(fptr);
@@ -99,6 +111,7 @@ int main(int argc, char **argv){
                     uint8_t *quan_table = malloc(64*sizeof(uint8_t));
                     for(int k =0;k<64;k ++){
                         quan_table[k] = fgetc(fptr);
+                        printf("quan_table[k] : %d",quan_table[k]); 
                     }
                     quan_ptr->data = quan_table;
                     j+= 65;
@@ -202,12 +215,7 @@ int main(int argc, char **argv){
 
             //Nombre de composantes N
             uint8_t N_comp = fgetc(fptr);
-            typedef struct {
-                uint8_t i_c;
-                uint8_t h_i;
-                uint8_t v_i;
-                uint8_t i_q;//table de quantification
-            } infos_comp;
+
             infos_comp **infos_img = malloc(N_comp*sizeof(infos_comp));
             for(int k=0;k<N_comp;k++){
                 infos_comp* case_k=malloc(sizeof(infos_comp));
@@ -273,7 +281,7 @@ int main(int argc, char **argv){
     for (int k=0;k<N_comp;k++){
         free(infos_img[k]);
     }
-    free(infos_img[k]);
+    free(infos_img);
     free(sos_table);
     //à compléter
     return 0;}
