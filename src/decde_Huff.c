@@ -114,6 +114,7 @@ int* decode_all_ac(Huff_arb *arbre, BitStream *bs) {
             for (int i = 0; i < 16; i++) coef_ac[k++] = 0;
             continue;
         }
+    
 
         // Lire l'indice du coefficient AC
         int indice = read_bits(bs, m);
@@ -157,7 +158,7 @@ int main(void) {
     
     printf("Arbre Huffman construit avec succès.\n");
     afficher_arbre(arbre);
-    uint8_t data[] = { 0b10010000 };
+    uint8_t data[] = { 0b01000111 };
     BitStream bs;
     create_bitstream(&bs, data, 1);
     int dc_init = 0;
