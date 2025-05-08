@@ -47,22 +47,4 @@ void transf_pgm(uint32_t tab[8][8], const char* nom){
     fclose(fichier);
 }
 
-// teste //
 
-
-// int main() {
-//     uint32_t image[8][8];
-
-//     for (int i = 0; i < 8; i++) {
-//         for (int j = 0; j < 8; j++) {
-//             uint8_t r = i * 32;   
-//             uint8_t g = j * 32;   
-//             uint8_t b = 0;        
-//             image[i][j] = (r << 16) | (g << 8) | b;
-//         }
-//     }
-
-//     transf_ppm(image, "test.ppm");
-//     printf("Fichier test.ppm généré.\n");
-//     return 0;
-// }
