@@ -2,7 +2,7 @@
 #define BITSTREAM_H
 
 #include <stdint.h>
-
+#include "decde_Huff.h"
 
 typedef struct {
     const uint8_t *data;
@@ -19,5 +19,6 @@ int read_bit(BitStream *bs);
 
 
 int read_bits(BitStream *bs, int n);
-
+int decode_dc(Huff_arb *arbre, int dc_init, BitStream *bs)
+int* decode_all_ac(Huff_arb *arbre, BitStream *bs)
 #endif

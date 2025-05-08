@@ -10,7 +10,7 @@ void **get_head(const char *fich){
     fgetc(fptr);
     fgetc(fptr); //avancer de deux octets 
     int byte; // tous les fichiers jpeg finissent par SOI et EOI
-    while((byte= fget(fptr) != EOF)){
+    while((byte= fgetc(fptr) != EOF)){
         
     }
     //APP0 
@@ -35,8 +35,8 @@ void **get_head(const char *fich){
     fgetc(fptr);
 
     //octets à ignorer
-    int i;
-    for(i=0;i<7;i++){fgetc(fptr);}
+   
+    for(int i=0;i<7;i++){fgetc(fptr);}
     //COM
 
     
