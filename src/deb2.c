@@ -1,58 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include "izigzag.h"
+#include "idct.h"
 
-void **get_head(const char *fich){
-    
-    FILE *fptr = fopen(fich,"rb");
-    int i = 0;
-    //SOI
-    fgetc(fptr);
-    fgetc(fptr); //avancer de deux octets 
-    int byte; // tous les fichiers jpeg finissent par SOI et EOI
-    while((byte= fgetc(fptr) != EOF)){
-        
-    }
-    //APP0 
-     
-    fgetc(fptr);
-    fgetc(fptr);
 
-    //taille de la section
-    int o_fort = fgetc(fptr);
-    int o_faible = fgetc(fptr);
-    size_t n= o_fort*256 + o_faible; 
-
-    //lecture de type
-    unsigned char l1 = fgetc(fptr);
-    unsigned char l2 = fgetc(fptr);
-    unsigned char l3 = fgetc(fptr);
-    unsigned char l4 = fgetc(fptr);
-    unsigned char l5 = fgetc(fptr);
-    unsigned char *typ = (l1,l2,l3,l4,l5);
-    //00 01
-    fgetc(fptr);
-    fgetc(fptr);
-
-    //octets à ignorer
-   
-    for(int i=0;i<7;i++){fgetc(fptr);}
-    //COM
-
-    
-    
-    
-    unsigned char by;
-    unsigned *bytes = malloc(n*sizeof(int)); //
-    for(i = 0;i<n;i++){
-         /*avancer d'un pas et voir si c'est la limite*/
-         by = fgetc(fptr);
-         bytes[i] = by;
-        
-        
-    }
-    return bytes;
-}
 int main(int argc, char **argv){
     if( argc != 2){
         return 1;
@@ -104,6 +56,7 @@ int main(int argc, char **argv){
     } infos_comp;
     infos_comp **infos_img =NULL;
     int N_comp = 0;
+    int N_comp_sos = 0;
     SOS_val **sos_table = NULL;
     uint16_t hauteur =0 ;
     uint16_t largeir= 0;
@@ -339,6 +292,9 @@ int main(int argc, char **argv){
         free(infos_img[k]);
     }
     free(infos_img);
+    for (int k=0;k<N_comp_sos;k++){
+        free(sos_table[k]);
+    }
     free(sos_table);
-    //à compléter
+    
     return 0;}

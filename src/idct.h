@@ -18,9 +18,10 @@ float **iDCT(uint16_t *matrice){//nécessite une converion si 8 bits
         for( int y=0;y<8;y++){
             float Sxy = 0.0;
             for(int lamb=0;lamb<8;lamb++){
+                float temp = C(lamb)*C(u)*cos((2*x+1)*lamb*M_PI/16);
                 for(int u=0;u<8;u++){
-                    Sxy += C(lamb)*C(u)*cos((2*x+1)*lamb*M_PI/16)
-                     *cos((2*y+1)*u*M_PI/16)*matrice[8*lamb+u]/4;
+                    Sxy += temp*
+                cos((2*y+1)*u*M_PI/16)*matrice[8*lamb+u]/4;
                 }
 
             }
