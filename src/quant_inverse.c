@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <quantification.h> 
+#include "quantification.h"
+
 void quant_inverse(uint8_t input[8][8], quantification_table *qt) {
     if (qt->prec == 0) {
         uint8_t *quant_table = (uint8_t *)qt->data;
