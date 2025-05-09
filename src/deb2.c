@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "izigzag.h"
 #include "idct.h"
+#include "quant_inverse.h"
+#include "decde_Huff.h"
 
 
 int main(int argc, char **argv){
@@ -29,7 +31,7 @@ int main(int argc, char **argv){
     uint8_t tab_q_traite =0; /*
     structure pour stocker les tableaux de différents tailles*/
 
-
+    
     
     quantification_table **tables = malloc( 4* sizeof(quantification_table *)); //4 tableaux au maximum
     
@@ -59,8 +61,10 @@ int main(int argc, char **argv){
     int N_comp_sos = 0;
     SOS_val **sos_table = NULL;
     uint16_t hauteur =0 ;
-    uint16_t largeir= 0;
-
+    uint16_t largeur= 0;
+    int16_t **brutes_Y = NULL;
+    int16_t **brutes_Cb = NULL;
+    int16_t **brutes_Cr= NULL;
     while((byte == 0xff)){//while pas de données brutes
         
         unsigned char flag = fgetc(fptr);
@@ -154,7 +158,7 @@ int main(int argc, char **argv){
             while( j <len_huff -2){
                 //trouver les informatons supplémentaires
                 uint16_t info = fgetc(fptr);
-                uint8_t type_huff = info & 0x10;
+                uint8_t type_huff = (info & 0x10)>>4;
                 uint8_t index_huff = info & 0x0F;
 
                 if (type_huff == 0){ //DC
@@ -254,6 +258,43 @@ int main(int argc, char **argv){
                 SH->i_dc = (ac_dc >> 4);
                 SH->i_ac = (ac_dc & 0x0F);
                 sos_table[k] = SH;
+                
+
+            }
+            //extraction des data brutes------------
+            //cas de non-sous echantionage
+            uint8_t h_max = 1;//sous ehantillonage,tous val 1
+            uint8_t v_max = 1;
+            uint8_t pix_lar = 8*h_max;
+            uint8_t pix_haut = 8*v_max;
+            uint16_t nb_mcu_x = ceil((float)largeur/pix_lar);
+            uint16_t nb_mcu_y = ceil((float)hauteur/pix_haut);
+            brutes_Y = malloc(nb_mcu_x*nb_mcu_y*sizeof(int16_t *));
+            brutes_Cb = malloc(nb_mcu_x*nb_mcu_y*sizeof(int16_t *));
+            brutes_Cr = malloc(nb_mcu_x*nb_mcu_y*sizeof(int16_t *));
+            for(int y=0;y<nb_mcu_y;y++){
+                for(int x=0;x<nb_mcu_x;x++){
+                    //pas besoin d'avoir h et v dans le cas invaders
+                    brutes_Y[x+ nb_mcu_x*y] = malloc(64*sizeof(int16_t));
+                    
+                    for(int c=0;c<64;c++){
+                        int16_t h_byte = fgetc(fptr)<<8;
+                        int16_t l_byte = fgetc(fptr);
+                        brutes_Y[x+ nb_mcu_x*y ][c] = h_byte + l_byte; 
+                    }
+                    brutes_Cb[x+ nb_mcu_x*y] = malloc(64*sizeof(int16_t));
+                    for(int c=0;c<64;c++){
+                        int16_t h_byte = fgetc(fptr)<<8;
+                        int16_t l_byte = fgetc(fptr);
+                        brutes_Cb[x+ nb_mcu_x*y ][c] = h_byte + l_byte; 
+                    }
+                    brutes_Cr[x+ nb_mcu_x*y] = malloc(64*sizeof(int16_t));
+                    for(int c=0;c<64;c++){
+                        int16_t h_byte = fgetc(fptr)<<8;
+                        int16_t l_byte = fgetc(fptr);
+                        brutes_Cr[x+ nb_mcu_x*y ][c] = h_byte + l_byte; 
+                    }
+                }
             }
             break;
         }
@@ -263,7 +304,15 @@ int main(int argc, char **argv){
         byte = fgetc(fptr); //avancer vers le ff
         printf("end : %x\n",byte);
         }
+    //extraction des données brutes
+    
     fclose(fptr);
+    
+
+
+
+
+
     for (int u=0;u< tab_q_traite; u++){
         if (tables[u]){
             free(tables[u]->data);
