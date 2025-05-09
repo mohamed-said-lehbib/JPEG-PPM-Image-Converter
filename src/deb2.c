@@ -3,9 +3,11 @@
 #include <stdint.h>
 #include "izigzag.h"
 #include "idct.h"
-#include "quant_inverse.h"
-#include "decde_Huff.h"
 #include "structs.h"
+#include "bitstream.h"
+#include "decde_Huff.h"
+#include <string.h>
+
 
 int main(int argc, char **argv){
     if( argc != 2){
@@ -50,7 +52,7 @@ int main(int argc, char **argv){
     while((byte == 0xff)){//while pas de données brutes
         
         unsigned char flag = fgetc(fptr);
-        printf("byte , flag = %d,%x\n",byte,flag);
+
         if(flag == 0xe0){ //APP0 
             //taille de la section
             int o_fort = fgetc(fptr);
@@ -64,7 +66,7 @@ int main(int argc, char **argv){
             unsigned char l4 = fgetc(fptr);
             unsigned char l5 = fgetc(fptr);
             unsigned char typ[5] = {l1,l2,l3,l4,l5};
-            printf("type: %s\n",typ);
+   
             for(int j=7;j< taille_app;j++){
                 fgetc(fptr);
             }
@@ -100,7 +102,7 @@ int main(int argc, char **argv){
                     uint8_t *quan_table = malloc(64*sizeof(uint8_t));
                     for(int k =0;k<64;k ++){
                         quan_table[k] = fgetc(fptr);
-                        printf("quan_table[%d] : %d\n",k,quan_table[k]); 
+   
                     }
                     quan_ptr->data = quan_table;
                     j+= 65;
@@ -148,17 +150,21 @@ int main(int argc, char **argv){
                     int n_symb = 0;//nombre des symboles
                     for (int k=0;k<16;k++){
                         table_longuer[k] = fgetc(fptr);
+                        printf("long %d : %d\n",k,table_longuer[k]);
                         n_symb += table_longuer[k];
                     }
                     uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
                     for(int k=0;k<n_symb;k++ ){
                         symbols[k] = fgetc(fptr);
-                        printf("symb %d:%d\n",k,symbols[k]);
+           
                     }
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
                     coll->lengths = table_longuer;
+                    
                     coll->symboles = symbols;
                     huff_dc[dc] = coll;
+                    for(int i=0;i<16;i++){
+                    printf("valeur apres stockage %d \n",huff_dc[dc]->lengths[i]);};
                     dc++;//dc = indice de prochain table s'il existe
                     j +=  1 + 16 + n_symb;
                     
@@ -173,7 +179,7 @@ int main(int argc, char **argv){
                     uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
                     for(int k=0;k<n_symb;k++ ){
                         symbols[k] = fgetc(fptr);
-                        printf("symb %d:%d\n",k,symbols[k]);
+         
                     }
                     
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
@@ -198,11 +204,11 @@ int main(int argc, char **argv){
             //hauteur et largeur
             uint16_t haut_h = fgetc(fptr);
             uint16_t haut_b = fgetc(fptr);
-            uint16_t hauteur = (haut_h<<8) + haut_b;
+            hauteur = (haut_h<<8) + haut_b;
 
             uint16_t lar_h = fgetc(fptr);
             uint16_t lar_b = fgetc(fptr);
-            uint16_t largeur = (lar_h<<8) + lar_b;
+            largeur = (lar_h<<8) + lar_b;
 
             //Nombre de composantes N
             uint8_t N_comp = fgetc(fptr);
@@ -243,14 +249,21 @@ int main(int argc, char **argv){
                 
 
             }
+            fgetc(fptr);
+            fgetc(fptr);
+            fgetc(fptr);
             //extraction des data brutes------------
             //cas de non-sous echantionage
-            uint8_t h_max = 1;//sous ehantillonage,tous val 1
+            
+            uint8_t h_max = 1;//pas de sous ehantillonage,tous val 1
             uint8_t v_max = 1;
             uint8_t pix_lar = 8*h_max;
             uint8_t pix_haut = 8*v_max;
-            uint16_t nb_mcu_x = ceil((float)largeur/pix_lar);
-            uint16_t nb_mcu_y = ceil((float)hauteur/pix_haut);
+            printf("larg %d\n",largeur);
+            uint16_t nb_mcu_x = ceil(largeur/pix_lar);
+            printf("nbx %d\n",nb_mcu_x);
+            uint16_t nb_mcu_y = ceil((hauteur/pix_haut));
+            printf("nby %d\n",nb_mcu_y);
             brutes_Y = malloc(nb_mcu_x*nb_mcu_y*sizeof(int16_t *));
             brutes_Cb = malloc(nb_mcu_x*nb_mcu_y*sizeof(int16_t *));
             brutes_Cr = malloc(nb_mcu_x*nb_mcu_y*sizeof(int16_t *));
@@ -260,21 +273,22 @@ int main(int argc, char **argv){
                     brutes_Y[x+ nb_mcu_x*y] = malloc(64*sizeof(int16_t));
                     
                     for(int c=0;c<64;c++){
-                        int16_t h_byte = fgetc(fptr)<<8;
-                        int16_t l_byte = fgetc(fptr);
-                        brutes_Y[x+ nb_mcu_x*y ][c] = h_byte + l_byte; 
+                        int16_t h_byte = fgetc(fptr);
+                        
+                        brutes_Y[x+ nb_mcu_x*y ][c] = h_byte ; 
+                        printf("Y machin %x\n",brutes_Y[x+ nb_mcu_x*y ][c]);
                     }
                     brutes_Cb[x+ nb_mcu_x*y] = malloc(64*sizeof(int16_t));
                     for(int c=0;c<64;c++){
-                        int16_t h_byte = fgetc(fptr)<<8;
-                        int16_t l_byte = fgetc(fptr);
-                        brutes_Cb[x+ nb_mcu_x*y ][c] = h_byte + l_byte; 
+                        int16_t h_byte = fgetc(fptr);
+                     
+                        brutes_Cb[x+ nb_mcu_x*y ][c] = h_byte ; 
                     }
                     brutes_Cr[x+ nb_mcu_x*y] = malloc(64*sizeof(int16_t));
                     for(int c=0;c<64;c++){
-                        int16_t h_byte = fgetc(fptr)<<8;
-                        int16_t l_byte = fgetc(fptr);
-                        brutes_Cr[x+ nb_mcu_x*y ][c] = h_byte + l_byte; 
+                        int16_t h_byte = fgetc(fptr);
+                        
+                        brutes_Cr[x+ nb_mcu_x*y ][c] = h_byte ; 
                     }
                 }
             }
@@ -284,17 +298,50 @@ int main(int argc, char **argv){
             break;//fin de ecture
         }
         byte = fgetc(fptr); //avancer vers le ff
-        printf("end : %x\n",byte);
+        
         }
-    //extraction des données brutes
+//--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
+    Huff_arb *arbre_dc = create_node();
+    uint16_t nb_symbols = strlen((char *)huff_dc[0]->symboles); 
+    uint8_t *data = huff_dc[0]->lengths;
+    for (int i=0;i<16;i++){
+        printf("data[%d] : %d hello\n",i,data[i]);
+    }
+  
+    int *symbols = (int *)huff_dc[0]->symboles; 
+    for (int i=0;i<nb_symbols;i++){
+        printf("symboles[%d] : %d\n",i,symbols[i]);
+    }
+    uint16_t code = 0;
+    int k = 0;
+    for (int i = 0; i < 16; i++) {
+        int len = i + 1;
+        for (int j = 0; j < data[i]; j++) {
+            insert_code(arbre_dc, code, symbols[k], len);
+            code++;
+            k++;
+            }
+        code <<= 1;
+        }
+    printf("Arbre Huffman construit avec succès.\n");
+    int16_t bitstream = brutes_Y[0][0];
+    printf("bitstream :%d",bitstream);
+    /*uint8_t data[] = { 0b01111100 };
+    BitStream bs;
+    create_bitstream(&bs, data, 1);
+    int dc_init = 0;
+    int DC = decode_dc(arbre_dc, dc_init, &bs);
+    printf("Valeur DC décodée : %d\n", DC);
+    free_arbre(arbre_dc);  */
+    
+
+
+
+
+//------------------------------------------------------------------------ FIN------------------------------------------------------------------------------------------------------------
     
     fclose(fptr);
-    
-
-
-
-
-
+   
     for (int u=0;u< tab_q_traite; u++){
         if (tables[u]){
             free(tables[u]->data);
