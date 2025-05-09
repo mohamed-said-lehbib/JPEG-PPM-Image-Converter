@@ -5,7 +5,7 @@
 #include "idct.h"
 #include "quant_inverse.h"
 #include "decde_Huff.h"
-
+#include "structs.h"
 
 int main(int argc, char **argv){
     if( argc != 2){
@@ -23,11 +23,7 @@ int main(int argc, char **argv){
     fgetc(fptr); //avancer de deux octets 
     // tous les fichiers jpeg finissent par SOI et EOI
     unsigned char byte = fgetc(fptr);
-    typedef struct {
-        uint8_t prec;//pour se souvenir de typpe de table
-        uint8_t i_q;
-        void *data;
-    } quantification_table;
+
     uint8_t tab_q_traite =0; /*
     structure pour stocker les tableaux de différents tailles*/
 
@@ -35,27 +31,13 @@ int main(int argc, char **argv){
     
     quantification_table **tables = malloc( 4* sizeof(quantification_table *)); //4 tableaux au maximum
     
-    typedef struct{
-        uint8_t *lengths;
-        uint8_t* symboles;
-    } huff_tbl;
+
     huff_tbl **huff_ac= malloc(4*sizeof(huff_tbl *));
     huff_tbl **huff_dc= malloc(4*sizeof(huff_tbl *));
     uint8_t ac = 0;//nombre de tables ac
 
     uint8_t dc = 0;//nombre de tables dc
-    typedef struct{
-        uint8_t i_c;
-        uint8_t i_ac;
-        uint8_t i_dc;
 
-    } SOS_val;
-    typedef struct {
-        uint8_t i_c;
-        uint8_t h_i;
-        uint8_t v_i;
-        uint8_t i_q;//table de quantification
-    } infos_comp;
     infos_comp **infos_img =NULL;
     int N_comp = 0;
     int N_comp_sos = 0;
