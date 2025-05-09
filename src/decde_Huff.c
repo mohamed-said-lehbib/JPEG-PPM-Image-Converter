@@ -127,7 +127,7 @@ int* decode_all_ac(Huff_arb *arbre, BitStream *bs) {
 
     return coef_ac;
 }
-
+/*
 
 void free_arbre(Huff_arb *arbre) {
     if (!arbre) return;
@@ -136,11 +136,11 @@ void free_arbre(Huff_arb *arbre) {
     free(arbre);
 }
 int main(void) {
-    uint8_t table[16] = { 0x00, 0x01, 0x01, 0x00,
+    uint8_t table[16] = { 0x01, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00}; // exemple
-    uint8_t symbols[2] = {0x00, 0x07}; // exemple de symboles
+    uint8_t symbols[2] = {0x07}; // exemple de symboles
 
     Huff_arb *arbre = create_node();
     uint16_t code = 0;
@@ -158,7 +158,7 @@ int main(void) {
     
     printf("Arbre Huffman construit avec succès.\n");
     afficher_arbre(arbre);
-    uint8_t data[] = { 0b01000111 };
+    uint8_t data[] = { 0b01111100 };
     BitStream bs;
     create_bitstream(&bs, data, 1);
     int dc_init = 0;
@@ -167,3 +167,4 @@ int main(void) {
     free_arbre(arbre);
     return 0;
 }
+*/
