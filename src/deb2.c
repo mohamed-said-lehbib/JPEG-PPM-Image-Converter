@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include "izigzag.h"
 #include "idct.h"
-#include "quant_inverse.h"
 #include "decde_Huff.h"
 #include "structs.h"
 #include <string.h>
@@ -170,6 +169,7 @@ int main(int argc, char **argv){
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
                     coll->lengths = table_longuer;
                     coll->symboles = symbols;
+                    coll->nb_symb = n_symb;
                     huff_dc[dc] = coll;
                     dc++;//dc = indice de prochain table s'il existe
                     j +=  1 + 16 + n_symb;
@@ -182,16 +182,20 @@ int main(int argc, char **argv){
                         table_longuer[k] = fgetc(fptr);
                         n_symb += table_longuer[k];
                     }
+                    printf("n_symb init = %d\n",n_symb);
                     uint8_t *symbols = malloc(n_symb*sizeof(uint8_t));
                     for(int k=0;k<n_symb;k++ ){
                         symbols[k] = fgetc(fptr);
-                        printf("symb %d:%d\n",k,symbols[k]);
+                        printf("symb ac %d:%x\n",k,symbols[k]);
                     }
                     
                     huff_tbl *coll = malloc(sizeof(huff_tbl));
+
                     coll->lengths = table_longuer;
                     coll->symboles = symbols;
+                    coll->nb_symb = n_symb;
                     huff_ac[ac] = coll;
+
                     ac++;//ac = indice de prochain table s'il existe
                     j += 1 + 16 + n_symb;
                 }
@@ -228,9 +232,9 @@ int main(int argc, char **argv){
                 case_k->h_i = (ech_fact>>4);
                 case_k->v_i = (ech_fact & 0x0F);
                 case_k->i_q = fgetc(fptr);//tableau de quantification
-
-                infos_img[k] = case_k;
                 
+                infos_img[k] = case_k;
+                printf("infos_img[%d]->i_q = %d\n",k,infos_img[k]->i_q);
 
             }
 
@@ -320,21 +324,90 @@ int main(int argc, char **argv){
             }
         code <<= 1;
         }
-    printf("Arbre Huffman construit avec succès.\n");
-    //int16_t bitstream = brutes_Y[0][0];
-    //printf("bitstream :%d",bitstream);
-    /*uint8_t data[] = { 0b01111100 };
+    printf("Arbre Huffman construit avec succès hello .\n");
+    uint8_t bitstream = brutes[0];
+    uint8_t data1[] = { bitstream };
     BitStream bs;
-    create_bitstream(&bs, data, 1);
+    create_bitstream(&bs, data1, 1);
     int dc_init = 0;
     int DC = decode_dc(arbre_dc, dc_init, &bs);
     printf("Valeur DC décodée : %d\n", DC);
-    free_arbre(arbre_dc);  */
-    
+//-------------------------------------decodage des coefficients AC------------------------------------------------    
+    Huff_arb *arbre_ac = create_node();
+    uint8_t nb_symbols_ac = huff_ac[0]->nb_symb; 
+    printf("nb_symbols_ac = %d\n",nb_symbols_ac);
+    uint8_t *data_ac = huff_ac[0]->lengths;
+    for (int i=0;i<16;i++){
+        printf("data[%d] : %d hello\n",i,data_ac[i]);
+    }
 
+    uint8_t *symbols_ac = huff_ac[0]->symboles; 
+    for (int i=0;i<nb_symbols_ac;i++){
+        printf("symboles[%d] : %x\n",i,symbols_ac[i]);
+    }
+    
+    uint16_t code_ac = 0;
+    int k_ac = 0;
+    for (int i = 0; i < 16; i++) {
+        int len = i + 1;
+        for (int j = 0; j < data_ac[i]; j++) {
+            insert_code(arbre_ac, code_ac, symbols_ac[k_ac], len);
+            code_ac++;
+            k_ac++;
+            }
+        code_ac <<= 1;
+        }
+
+    printf("Arbre Huffman construit avec succès.\n");
+    uint8_t data2[] = {
+        0xD1, 0xCA, 0xCA, 0xDC, 0x76, 0xDA, 0x4D,
+        0x6A, 0x00, 0x15, 0xED, 0x41, 0xF1, 0x2D, 0x3A,
+        0xDC, 0x70, 0x8B, 0x16, 0xBE, 0x4C, 0xC9, 0xBB,
+        0xB3, 0x4F, 0xFB, 0x35, 0xB8, 0x7D, 0x13, 0xAB,
+        0x12, 0x9D, 0x0F, 0x0E, 0x1F, 0x4E, 0x1D, 0xE3
+    };
+
+    
+    size_t data_ac_len = sizeof(data2);
+
+    BitStream bs_ac;
+    create_bitstream(&bs_ac, data2, data_ac_len);
+
+    // Décoder les coefficients AC
+    int *coeffs =(int *) decode_all_ac(arbre_ac, &bs_ac);
+    for (int i = 0; i < 63; i++) {
+        printf(" %x",coeffs[i]);
+    }
+    // Libération mémoire
+
+    
+//----------------------------------Le brutes apres decodage ------------------------------------------------
+    int16_t *brutes_dec = malloc(64*sizeof(int16_t));
+    brutes_dec[0] = DC;
+    for (int i=1;i<64;i++){
+        brutes_dec[i] = coeffs[i];
+    }  
+    for (int i=0;i<64;i++){
+        printf("brutes_dec[%d] : %x\n",i,brutes_dec[i]);
+    }
+    
+//------------------------------------Zigzg inverse ----------------------------------------
+    uint16_t *Bloc = zigzag_inv(brutes_dec);
+    printf("Bloc après zigzag inverse :\n");
+    for (int i = 0; i < 64; i++) {
+        printf("%x ", Bloc[i]);
+    }
+//-------------------------------------IDCT---------------------------------------------------------
+    Bloc = iDCT(Bloc);
+    printf("Bloc après idct :\n");
+    for (int i = 0; i < 64; i++) {
+        printf("%x ", Bloc[i]);
+    }
+//----------------------------------------FIN--------------------------------------------------------------
     fclose(fptr);
-    
-
+ // Libération mémoire
+    free_arbre(arbre_ac);
+    free(coeffs);
 
 
 
