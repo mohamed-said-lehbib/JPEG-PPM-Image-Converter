@@ -9,11 +9,10 @@ float C(uint16_t eps){//calcule de la fonction C
     }
     return 1;
 }
-float **iDCT(uint16_t *matrice){//nécessite une converion si 8 bits
-    float **S = malloc(8*sizeof(float *));
-    for(int ligne =0;ligne<8;ligne ++){
-        S[ligne] = malloc(8*sizeof(float));
-    }
+float *iDCT(int *matrice){//nécessite une converion si 8 bits
+    float *S = malloc(64*sizeof(float *));
+   
+    
     for ( int x = 0;x<8;x++){
         for( int y=0;y<8;y++){
             float Sxy = 0.0;
@@ -25,7 +24,7 @@ float **iDCT(uint16_t *matrice){//nécessite une converion si 8 bits
                 }
 
             }
-            S[x][y] = Sxy;
+            S[x +8*y] = Sxy;
         }
     }
     return S;

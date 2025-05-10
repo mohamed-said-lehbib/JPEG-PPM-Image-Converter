@@ -1,3 +1,7 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -16,6 +20,7 @@ typedef struct {
 } quantification_table;
 //longuers et symboles de huffmann
 typedef struct{
+    uint8_t nb_symb;
     uint8_t *lengths;
     uint8_t* symboles;
 } huff_tbl;
@@ -26,3 +31,5 @@ typedef struct {
     uint8_t v_i;
     uint8_t i_q;//table de quantification
 } infos_comp;
+
+#endif

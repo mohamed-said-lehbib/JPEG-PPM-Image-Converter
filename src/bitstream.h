@@ -5,14 +5,14 @@
 
 
 typedef struct {
-    const uint8_t *data;
+     uint8_t *data;
     int octet_posi;       
     int bit_posi;          
     int size;             
 } BitStream;
 
 
-BitStream create_bitstream(BitStream *bs, const uint8_t *data, int size);
+BitStream create_bitstream(BitStream *bs, uint8_t *data, int size);
 
 
 int read_bit(BitStream *bs);

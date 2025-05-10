@@ -14,6 +14,6 @@ Huff_arb *create_node();
 void insert_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur);
 int decode_dc(Huff_arb *arbre, int dc_init, BitStream *bs);
 void free_arbre(Huff_arb *arbre);
-int decode_dc(Huff_arb *arbre, int dc_init, BitStream *bs);
+
 int* decode_all_ac(Huff_arb *arbre, BitStream *bs);
 #endif

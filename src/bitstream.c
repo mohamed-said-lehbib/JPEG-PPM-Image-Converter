@@ -5,7 +5,7 @@
 #include "bitstream.h"
 
 // Créer un bitstream
-BitStream create_bitstream(BitStream *bs, const uint8_t *data, int m) {
+BitStream create_bitstream(BitStream *bs,  uint8_t *data, int m) {
     bs->data = data;
     bs->octet_posi = 0;
     bs->bit_posi = 0;

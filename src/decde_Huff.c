@@ -127,6 +127,78 @@ int* decode_all_ac(Huff_arb *arbre, BitStream *bs) {
 
     return coef_ac;
 }
+void free_arbre(Huff_arb *arbre) {
+    if (!arbre) return;
+    free_arbre(arbre->fg);
+    free_arbre(arbre->fd);
+    free(arbre);
+}
+
+
+
+/*
+int main(void) {
+    // Table Huffman AC (table & symboles fictifs ici, adapte selon ton vrai tableau JPEG)
+    uint8_t table[16] = {
+        0x00, 0x02, 0x01, 0x02,
+        0x07, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    };
+    
+    uint8_t symbols[12] = {
+        0x17, 0x18,           // longueur 2
+        0x15,                 // longueur 3
+        0x08, 0x19,           // longueur 4
+        0x00, 0x09, 0x13, 0x23, 0x28, 0x29, 0x37  // longueur 5
+    };
+
+    // Construire l'arbre Huffman
+    Huff_arb *arbre = create_node();
+    uint16_t code = 0;
+    int k = 0;
+    for (int i = 0; i < 16; i++) {
+        int len = i + 1;
+        for (int j = 0; j < table[i]; j++) {
+            insert_code(arbre, code, symbols[k], len);
+            code++;
+            k++;
+        }
+        code <<= 1;
+    }
+
+    printf("Arbre Huffman construit avec succès.\n");
+
+    // Données JPEG AC simulées
+    uint8_t data[] = {
+        0xD1, 0xCA, 0xCA, 0xDC, 0x76, 0xDA, 0x4D,
+        0x6A, 0x00, 0x15, 0xED, 0x41, 0xF1, 0x2D, 0x3A,
+        0xDC, 0x70, 0x8B, 0x16, 0xBE, 0x4C, 0xC9, 0xBB,
+        0xB3, 0x4F, 0xFB, 0x35, 0xB8, 0x7D, 0x13, 0xAB,
+        0x12, 0x9D, 0x0F, 0x0E, 0x1F, 0x4E, 0x1D, 0xE3
+    };
+    size_t data_len = sizeof(data);
+
+    BitStream bs;
+    create_bitstream(&bs, data, data_len);
+
+    // Décoder les coefficients AC
+    int *coeffs = decode_all_ac(arbre, &bs);
+
+    // Affichage
+    printf("Coefficients AC décodés:\n");
+    for (int i = 0; i < 63; i++) {
+        printf("%x ", coeffs[i]);
+    }
+    printf("\n");
+
+    // Libération mémoire
+    free(coeffs);
+    free_arbre(arbre);
+
+    return 0;
+}
+*/
 /*
 
 void free_arbre(Huff_arb *arbre) {
