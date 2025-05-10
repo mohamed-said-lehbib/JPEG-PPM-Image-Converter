@@ -9,8 +9,8 @@ float C(uint16_t eps){//calcule de la fonction C
     }
     return 1;
 }
-float *iDCT(int *matrice){//nécessite une converion si 8 bits
-    float *S = malloc(64*sizeof(float *));
+uint8_t *iDCT(int *matrice){//nécessite une converion si 8 bits
+    uint8_t *S = malloc(64*sizeof(uint8_t));
    
     
     for ( int x = 0;x<8;x++){
@@ -20,11 +20,11 @@ float *iDCT(int *matrice){//nécessite une converion si 8 bits
                 float temp = C(lamb)*cos((2*x+1)*lamb*M_PI/16);
                 for(int u=0;u<8;u++){
                     Sxy += temp*
-                C(u)*cos((2*y+1)*u*M_PI/16)*matrice[8*lamb+u]/4;
+                C(u)*cos((2*y+1)*u*M_PI/16)*matrice[8*lamb+u]/4.0f;
                 }
 
             }
-            S[x +8*y] = Sxy;
+            S[x +8*y] = (uint8_t) fminf(255.0f , fmaxf(0.0f,roundf(Sxy+128.0f)));
         }
     }
     return S;
