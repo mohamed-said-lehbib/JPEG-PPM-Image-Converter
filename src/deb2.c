@@ -57,6 +57,7 @@ int main(int argc, char **argv){
     uint16_t largeur= 0;
     uint8_t *brutes = NULL;
     size_t cap = 0;//taille variable
+    uint16_t N_brute =0;
     while((byte == 0xff)){//while pas de données brutes
         
         unsigned char flag = fgetc(fptr);
@@ -214,16 +215,16 @@ int main(int argc, char **argv){
             //hauteur et largeur
             uint16_t haut_h = fgetc(fptr);
             uint16_t haut_b = fgetc(fptr);
-            uint16_t hauteur = (haut_h<<8) + haut_b;
+            hauteur = (haut_h<<8) + haut_b;
 
             uint16_t lar_h = fgetc(fptr);
             uint16_t lar_b = fgetc(fptr);
-            uint16_t largeur = (lar_h<<8) + lar_b;
+            largeur = (lar_h<<8) + lar_b;
 
             //Nombre de composantes N
-            uint8_t N_comp = fgetc(fptr);
+            N_comp = fgetc(fptr);
 
-            infos_comp **infos_img = malloc(N_comp*sizeof(infos_comp));
+            infos_img = malloc(N_comp*sizeof(infos_comp));
             for(int k=0;k<N_comp;k++){
                 infos_comp* case_k=malloc(sizeof(infos_comp));
                 uint8_t i_c = fgetc(fptr);
@@ -245,9 +246,9 @@ int main(int argc, char **argv){
             uint16_t len_sos_f = fgetc(fptr);
             uint16_t len_sos = (len_sos_b<<8) + len_sos_f;
             //nombre de composante sos
-            uint8_t N_comp_sos = fgetc(fptr);
+            N_comp_sos = fgetc(fptr);
             
-            SOS_val **sos_table = malloc(N_comp_sos*sizeof(SOS_val *));
+            sos_table = malloc(N_comp_sos*sizeof(SOS_val *));
             for(int k=0;k<N_comp_sos;k++){
                 uint8_t i_c = fgetc(fptr);
                 uint8_t ac_dc = fgetc(fptr);
@@ -269,19 +270,26 @@ int main(int argc, char **argv){
             uint32_t pointer_vr = 0;
             brutes = malloc(cap*sizeof(uint8_t));
             uint8_t next = fgetc(fptr);
+            N_brute = 0;
             while((next != 0xd9) | (byte != 0xff)){
                 printf("val de bit et next:%x et %x\n",byte,next);
                 if (byte == 0xff){
                     if (next !=0){
                         brutes[pointer_vr++] = byte;
+                        printf("val%d",brutes[pointer_vr]);
                         brutes[pointer_vr++] = next; 
+                        printf("val%d",brutes[pointer_vr]);
                     }
                     else{
                         brutes[pointer_vr++] = byte;
+                        printf("val%d",brutes[pointer_vr]);
                     }
                 }
                 else{
                     brutes[pointer_vr++] = byte;
+                    brutes[pointer_vr++] = next;
+                    printf("val%d",brutes[pointer_vr]);
+                    
                 }
                 byte = fgetc(fptr);
                 next = fgetc(fptr);
@@ -291,7 +299,7 @@ int main(int argc, char **argv){
                 }
                 
             }
-            
+        N_brute = pointer_vr ;    
             break;
         }
         else if(flag == 0xd9){//EOI
@@ -336,9 +344,9 @@ int main(int argc, char **argv){
     Huff_arb *arbre_ac = create_node();
     uint8_t nb_symbols_ac = huff_ac[0]->nb_symb; 
     printf("nb_symbols_ac = %d\n",nb_symbols_ac);
-    uint8_t *data_ac = huff_ac[0]->lengths;
+    uint8_t *len_ac = huff_ac[0]->lengths;
     for (int i=0;i<16;i++){
-        printf("data[%d] : %d hello\n",i,data_ac[i]);
+        printf("data[%d] : %d hello\n",i,len_ac[i]);
     }
 
     uint8_t *symbols_ac = huff_ac[0]->symboles; 
@@ -350,7 +358,7 @@ int main(int argc, char **argv){
     int k_ac = 0;
     for (int i = 0; i < 16; i++) {
         int len = i + 1;
-        for (int j = 0; j < data_ac[i]; j++) {
+        for (int j = 0; j < len_ac[i]; j++) {
             insert_code(arbre_ac, code_ac, symbols_ac[k_ac], len);
             code_ac++;
             k_ac++;
@@ -359,29 +367,27 @@ int main(int argc, char **argv){
         }
 
     printf("Arbre Huffman construit avec succès.\n");
-    uint8_t data2[] = {
-        0xD1, 0xCA, 0xCA, 0xDC, 0x76, 0xDA, 0x4D,
-        0x6A, 0x00, 0x15, 0xED, 0x41, 0xF1, 0x2D, 0x3A,
-        0xDC, 0x70, 0x8B, 0x16, 0xBE, 0x4C, 0xC9, 0xBB,
-        0xB3, 0x4F, 0xFB, 0x35, 0xB8, 0x7D, 0x13, 0xAB,
-        0x12, 0x9D, 0x0F, 0x0E, 0x1F, 0x4E, 0x1D, 0xE3
-    };
-
+    uint8_t *data2 = malloc((N_brute -1)*sizeof(uint8_t));
+    for(int i=0;i<N_brute-1;i++){
+        data2[i] = brutes[i+1];
+        printf("brutes %x\n",data2[i]);
+    }
     
-    size_t data_ac_len = sizeof(data2);
+    size_t data_ac_len = N_brute - 1;
 
     BitStream bs_ac;
-    create_bitstream(&bs_ac, data2, data_ac_len);
+    create_bitstream(&bs_ac, data2, N_brute-1);
 
     // Décoder les coefficients AC
     int *coeffs =(int *) decode_all_ac(arbre_ac, &bs_ac);
     for (int i = 0; i < 63; i++) {
-        printf(" %x",coeffs[i]);
+        printf(" %d\n",coeffs[i]);
     }
     // Libération mémoire
 
     
 //----------------------------------Le brutes apres decodage ------------------------------------------------
+    
     int16_t *brutes_dec = malloc(64*sizeof(int16_t));
     brutes_dec[0] = DC;
     for (int i=1;i<64;i++){
@@ -390,6 +396,7 @@ int main(int argc, char **argv){
     for (int i=0;i<64;i++){
         printf("brutes_dec[%d] : %x\n",i,brutes_dec[i]);
     }
+//   ------------------------------------Quantification inverse ----------------------------------------
     
 //------------------------------------Zigzg inverse ----------------------------------------
     uint16_t *Bloc = zigzag_inv(brutes_dec);
@@ -398,10 +405,10 @@ int main(int argc, char **argv){
         printf("%x ", Bloc[i]);
     }
 //-------------------------------------IDCT---------------------------------------------------------
-    Bloc = iDCT(Bloc);
-    printf("Bloc après idct :\n");
+    uint8_t* bloc= iDCT(Bloc);
+    printf("bloc après idct :\n");
     for (int i = 0; i < 64; i++) {
-        printf("%x ", Bloc[i]);
+        printf("%x ", bloc[i]);
     }
 //----------------------------------------FIN--------------------------------------------------------------
     fclose(fptr);
