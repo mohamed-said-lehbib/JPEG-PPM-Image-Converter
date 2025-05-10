@@ -9,7 +9,7 @@ float C(uint16_t eps){//calcule de la fonction C
     }
     return 1;
 }
-uint8_t *iDCT(int *matrice){//nécessite une converion si 8 bits
+uint8_t *iDCT(int16_t *matrice){//nécessite une converion si 8 bits
     uint8_t *S = malloc(64*sizeof(uint8_t));
    
     
@@ -24,7 +24,7 @@ uint8_t *iDCT(int *matrice){//nécessite une converion si 8 bits
                 }
 
             }
-            S[x +8*y] = (uint8_t) fminf(255.0f , fmaxf(0.0f,roundf(Sxy+128.0f)));
+            S[8*x +y] = (uint8_t) fminf(255.0f , fmaxf(0.0f,roundf(Sxy+128.0f)));
         }
     }
     return S;

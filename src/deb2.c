@@ -6,6 +6,7 @@
 #include "decde_Huff.h"
 #include "structs.h"
 #include <string.h>
+#include "quant_inverse.h"
 
 int main(int argc, char **argv){
     if( argc != 2){
@@ -381,35 +382,49 @@ int main(int argc, char **argv){
     // Décoder les coefficients AC
     int *coeffs =(int *) decode_all_ac(arbre_ac, &bs_ac);
     for (int i = 0; i < 63; i++) {
-        printf(" %d\n",coeffs[i]);
+        printf("coeffs %d\n",coeffs[i]);
     }
     // Libération mémoire
 
     
 //----------------------------------Le brutes apres decodage ------------------------------------------------
     
-    int16_t *brutes_dec = malloc(64*sizeof(int16_t));
+    int *brutes_dec = malloc(64*sizeof(int));
     brutes_dec[0] = DC;
     for (int i=1;i<64;i++){
-        brutes_dec[i] = coeffs[i];
+        brutes_dec[i] = coeffs[i-1];
     }  
-    for (int i=0;i<64;i++){
-        printf("brutes_dec[%d] : %x\n",i,brutes_dec[i]);
-    }
+ 
 //   ------------------------------------Quantification inverse ----------------------------------------
-    
+    quant_inverse(brutes_dec,tables[infos_img[0]->i_q]);
+    for (int i=0;i<64;i++){
+        printf("brutes_dec[%d] : %d\n",i,brutes_dec[i]);
+    } 
 //------------------------------------Zigzg inverse ----------------------------------------
-    uint16_t *Bloc = zigzag_inv(brutes_dec);
+    int16_t *Bloc = zigzag_inv(brutes_dec);
     printf("Bloc après zigzag inverse :\n");
-    for (int i = 0; i < 64; i++) {
-        printf("%x ", Bloc[i]);
+
+    printf(" temp test \n");
+    for(int i = 0; i<8;i++)
+    {
+        for(int j =0;j<8;j++)
+        {
+            printf("%3d      ",Bloc[i*8+j]);
+        }
+        printf("\n");
     }
-//-------------------------------------IDCT---------------------------------------------------------
+    printf("\n");
+//------------------------------------IDCT---------------------------------------------------------
     uint8_t* bloc= iDCT(Bloc);
-    printf("bloc après idct :\n");
-    for (int i = 0; i < 64; i++) {
-        printf("%x ", bloc[i]);
+    for(int i = 0; i<8;i++)
+    {
+        for(int j =0;j<8;j++)
+        {
+            printf("%3d      ",bloc[i*8+j]);
+        }
+        printf("\n");
     }
+
 //----------------------------------------FIN--------------------------------------------------------------
     fclose(fptr);
  // Libération mémoire
