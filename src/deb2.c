@@ -429,17 +429,16 @@ int main(int argc, char **argv){
 
     uint8_t tab[8][8];
 
-    // Remplir la matrice avec des uint8_t (valeurs positives de 0 à 255)
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             int16_t val = bloc[i * 8 + j];
-            if (val < 0) val = 0;       // Clamp négatif à 0
-            if (val > 255) val = 255;   // Clamp supérieur à 255
+            if (val < 0) val = 0;      
+            if (val > 255) val = 255;   
             tab[i][j] = (uint8_t)val;
         }
     }
 
-    transf_ppm(tab, "image.ppm");
+    transf_pgm(tab, "image.ppm");
 //----------------------------------------FIN--------------------------------------------------------------
     fclose(fptr);
  // Libération mémoire
