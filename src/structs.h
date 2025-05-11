@@ -32,12 +32,16 @@ typedef struct {
     uint8_t i_q;//table de quantification
 } infos_comp;
 
+
+// Composantes Y Cb Cr
 typedef struct {
-    uint16_t****** Y;
+    uint16_t****** Y;  //N'ayez pas peur
     uint16_t****** Cb1;
     uint16_t****** Cr1;
 } YCbCrstr;
 
+
+// MCUs
 typedef struct {
     uint16_t **** mcu
 } Mcu;
