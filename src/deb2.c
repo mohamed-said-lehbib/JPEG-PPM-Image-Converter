@@ -7,6 +7,7 @@
 #include "structs.h"
 #include <string.h>
 #include "quant_inverse.h"
+#include "lec_ppm.h"
 
 int main(int argc, char **argv){
     if( argc != 2){
@@ -398,7 +399,7 @@ int main(int argc, char **argv){
 //   ------------------------------------Quantification inverse ----------------------------------------
     quant_inverse(brutes_dec,tables[infos_img[0]->i_q]);
     for (int i=0;i<64;i++){
-        printf("brutes_dec[%d] : %d\n",i,brutes_dec[i]);
+        printf("brutes_dec[%d] : %x\n",i,brutes_dec[i]);
     } 
 //------------------------------------Zigzg inverse ----------------------------------------
     int16_t *Bloc = zigzag_inv(brutes_dec);
@@ -409,7 +410,7 @@ int main(int argc, char **argv){
     {
         for(int j =0;j<8;j++)
         {
-            printf("%3d      ",Bloc[i*8+j]);
+            printf("%3x      ",Bloc[i*8+j]);
         }
         printf("\n");
     }
@@ -420,11 +421,25 @@ int main(int argc, char **argv){
     {
         for(int j =0;j<8;j++)
         {
-            printf("%3d      ",bloc[i*8+j]);
+            printf("%3x      ",bloc[i*8+j]);
         }
         printf("\n");
     }
+//------------------------------------Ecriture dans le fichier PPM -------------------------------------------
 
+    uint8_t tab[8][8];
+
+    // Remplir la matrice avec des uint8_t (valeurs positives de 0 à 255)
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            int16_t val = bloc[i * 8 + j];
+            if (val < 0) val = 0;       // Clamp négatif à 0
+            if (val > 255) val = 255;   // Clamp supérieur à 255
+            tab[i][j] = (uint8_t)val;
+        }
+    }
+
+    transf_ppm(tab, "image.ppm");
 //----------------------------------------FIN--------------------------------------------------------------
     fclose(fptr);
  // Libération mémoire

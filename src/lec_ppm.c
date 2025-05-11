@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 
-void transf_ppm(uint32_t tab[8][8], const char* nom){
+void transf_ppm(uint8_t tab[8][8], const char* nom){
     
 
     FILE *fichier = fopen(nom, "wb");
@@ -25,7 +25,7 @@ void transf_ppm(uint32_t tab[8][8], const char* nom){
 }
 
 
-void transf_pgm(uint32_t tab[8][8], const char* nom){
+void transf_pgm(int tab[8][8], const char* nom){
     
 
     FILE *fichier = fopen(nom, "wb");
