@@ -33,13 +33,13 @@ typedef struct {
 } infos_comp;
 
 typedef struct {
-    uint16_t*** Y;
-    uint16_t*** Cb1;
-    uint16_t*** Cr1;
+    uint16_t****** Y;
+    uint16_t****** Cb1;
+    uint16_t****** Cr1;
 } YCbCrstr;
 
 typedef struct {
-    uint16_t ** mcu
+    uint16_t **** mcu
 } Mcu;
 
 #endif
