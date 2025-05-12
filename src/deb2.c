@@ -376,12 +376,12 @@ int main(int argc, char **argv){
     create_bitstream(&bs, brutes, N_brute);
     int **blocs = decode_bloc(arbre_dc, arbre_ac, &bs ,nb_mcux,nb_mcuy);
 
-    /*for(int i=0 ; i<1 ; i++){
+    for(int i=0 ; i<1 ; i++){
         printf("\nBLOC\n");
         for (int j =0; j<64;j++){
             printf( "%x ", blocs[i][j]);
          }
-    }*/
+    }
     
 
    
@@ -394,7 +394,12 @@ int main(int argc, char **argv){
         
     }
 
- 
+  for(int i=0 ; i<1 ; i++){
+        printf("\nquant\n");
+        for (int j =0; j<64;j++){
+            printf( "%x ", blocs[i][j]);
+         }
+    }
 
     
 
@@ -409,15 +414,26 @@ int main(int argc, char **argv){
         
     }
   
-    
+     for(int i=0 ; i<1 ; i++){
+        printf("\nizz\n");
+        for (int j =0; j<64;j++){
+            printf( "%x ", izz[i][j]);
+         }
+    }
 
 //------------------------------------IDCT---------------------------------------------------------
-    uint8_t **idct = malloc(nb_mcux*nb_mcuy*sizeof(uint8_t));
+    uint8_t **idct = malloc(nb_mcux*nb_mcuy*sizeof(uint8_t *));
     for (int k=0 ; k<nb_mcux*nb_mcuy ; k++){
         idct[k] = iDCT(izz[k]);
     }
     
-    
+     for(int i=0 ; i<1 ; i++){
+        printf("\nidct\n");
+        for (int j =0; j<64;j++){
+            printf( "%02x ", idct[i][j]);
+            if((j+1)%8==0) printf("\n");
+         }
+    }
 
 //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
     
