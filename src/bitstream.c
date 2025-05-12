@@ -23,6 +23,10 @@ int read_bit(BitStream *bs) {
     if (bs->bit_posi == 8) {
         bs->bit_posi = 0;
         bs->octet_posi++;
+        if (bs->data[bs->octet_posi - 1] == 0xff) {
+           bs->octet_posi += 1 ;
+        }
+
     }
     return bit;
 }

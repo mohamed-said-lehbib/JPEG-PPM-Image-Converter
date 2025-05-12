@@ -43,7 +43,7 @@ typedef struct {
 
 // MCUs
 typedef struct {
-    uint16_t **** mcu
+    uint16_t **** mcu;
 } Mcu;
 
 #endif

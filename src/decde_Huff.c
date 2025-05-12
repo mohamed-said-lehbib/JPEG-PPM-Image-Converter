@@ -127,6 +127,36 @@ int* decode_all_ac(Huff_arb *arbre, BitStream *bs) {
 
     return coef_ac;
 }
+int **decode_bloc(Huff_arb *arbre_dc, Huff_arb *arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy) {
+    int **bloc = malloc(nb_mcux*nb_mcuy* sizeof(int*));
+    for (int i = 0; i < nb_mcux*nb_mcuy; i++) {
+        bloc[i] = malloc(64 * sizeof(int));
+        printf("\n nouveau bloc");
+    }
+    uint16_t blo_idx = 0;
+    while (blo_idx < nb_mcux*nb_mcuy && bs->octet_posi < bs->size) {
+        printf("\n nouveau bloc %d", blo_idx);
+        if (blo_idx == 0){
+            bloc[blo_idx][0] = decode_dc(arbre_dc, 0, bs);
+        }
+        else {
+            bloc[blo_idx][0] = decode_dc(arbre_dc,bloc[blo_idx-1][0], bs);
+        }
+        int *coeffs_ac = decode_all_ac(arbre_ac, bs);
+        for (int j = 1; j < 64; j++) {
+            bloc[blo_idx][j] = coeffs_ac[j-1];
+        }
+        free(coeffs_ac);
+        
+        blo_idx++;
+    }
+    
+    return bloc;
+
+    }
+
+    
+
 void free_arbre(Huff_arb *arbre) {
     if (!arbre) return;
     free_arbre(arbre->fg);
@@ -134,8 +164,109 @@ void free_arbre(Huff_arb *arbre) {
     free(arbre);
 }
 
+/*
+int main(void) {
+    // 1. Table fictive Huffman DC et AC
+    uint8_t table_dc[16] = {   0x01, 0x01, 0x00,
+        0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00 }; 
+    uint8_t symbols_dc[2] = { 0x07, 0x00 };
+
+    uint8_t table_ac[16] = { 0x00 ,0x02, 0x02, 0x01, 0x04,
+        0x02, 0x03, 0x01, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00}; 
+    uint8_t symbols_ac[15] = { 0x01, 0x03, 0x02, 0x04,
+        0x05, 0x06, 0x11, 0x12,
+        0x21, 0x07, 0x13, 0x00,
+        0x14, 0x31, 0x33
+    };
+
+    //Création des arbres Huffman
+    Huff_arb *arbre_dc = create_node();
+    Huff_arb *arbre_ac = create_node();
+// remplir l'arbre dc
+    uint16_t code = 0;
+    int k = 0;
+    for (int i = 0; i < 16; i++) {
+        int len = i + 1;
+        for (int j = 0; j < table_dc[i]; j++) {
+            insert_code(arbre_dc, code, symbols_dc[k], len);
+            code++;
+            k++;
+        }
+        code <<= 1;
+    }
+    printf( "l'arbre DC est rempli\n");
+// remplir l'arbre AC
+    code = 0; k = 0;
+    for (int i = 0; i < 16; i++) {
+        int len = i + 1;
+        for (int j = 0; j < table_ac[i]; j++) {
+            insert_code(arbre_ac, code, symbols_ac[k], len);
+            code++;
+            k++;
+        }
+        code <<= 1;
+    }
+    
+    afficher_arbre(arbre_dc);
+    printf( "l'arbre AC est rempli\n");
+    afficher_arbre(arbre_ac);
+    // 3. Données simulées (DC + AC de plusieurs blocs consécutifs)
+    uint8_t data[] = {
+        0x47, 0xF0, 0x7B, 0x31, 0x16, 0xF4, 0xD0, 0xC1, 0xD7, 0x7B,
+        0x31, 0x56, 0x68, 0x29, 0xA3, 0x35, 0x5D, 0x22, 0x0A, 0x75,
+        0x87, 0xCF, 0xD6, 0xC4, 0x3B, 0xDB, 0xCA, 0x73, 0x87, 0x14,
+        0x15, 0x9D, 0x87, 0x0F, 0xEB, 0xD8, 0x00, 0xEC, 0x6F, 0x39,
+        0x54, 0xF1, 0xCE, 0x63, 0x0F, 0x7F, 0x30, 0x9C, 0x72, 0x9D,
+        0xA9, 0x23, 0xF5, 0x16, 0xBB, 0x54, 0x2C, 0xC0, 0x03, 0xED,
+        0x69, 0x8A, 0xC3, 0x17, 0xCB, 0x89, 0xDA, 0x03, 0xB3, 0xFA,
+        0x7A, 0xDB, 0xAE, 0x81, 0x6F, 0x8D, 0x75, 0xB5, 0x4C, 0x1A,
+        0xAC, 0x51, 0xAF, 0xA3, 0xF4, 0xFB, 0xB2, 0x12, 0x62, 0xE2,
+        0xEB, 0x97, 0x9C, 0x9A, 0xA5, 0xB4, 0x66, 0x25, 0xEE, 0x32,
+        0x63, 0x3F, 0x63, 0x12, 0x22, 0x0C, 0x47, 0x7B, 0x48, 0x1D,
+        0x8F, 0x67, 0xE1, 0x65, 0x8D, 0x67, 0x67, 0x50, 0xEB, 0xFC,
+        0xF5, 0x0D, 0x27, 0x7E, 0x85, 0xDD, 0x21, 0x46, 0xCD, 0x68,
+        0x54, 0xBC, 0xAA, 0x8A, 0x4C, 0x2E, 0x49, 0x35, 0xE5, 0x06,
+        0xB0, 0x45, 0x50, 0x84, 0x0C, 0xE6, 0xD9, 0x96, 0x16, 0x44,
+        0x46, 0x3B, 0xAA, 0x3C, 0x47, 0x02, 0x07, 0xCF
+    };
+
+    BitStream bs;
+    create_bitstream(&bs, data, sizeof(data));
 
 
+    int **blocs = decode_bloc(arbre_dc, arbre_ac, &bs);
+    printf("je suis pas encore la ");
+
+    //  affichage
+    for (int b = 0; b < 4; b++) {
+        if (blocs[b] == NULL) {
+            printf("eera3ini");
+            break;}
+        printf("Bloc %d:\n", b);
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                printf("%4x ", blocs[b][i * 8 + j]);
+            }
+            printf("\n");
+        }
+        printf("\n");
+    
+    }
+        
+
+    // Libération mémoire
+    free(blocs);
+    free_arbre(arbre_dc);
+    free_arbre(arbre_ac);
+
+    return 0;
+}
+*/
 /*
 int main(void) {
     // Table Huffman AC (table & symboles fictifs ici, adapte selon ton vrai tableau JPEG)
