@@ -305,14 +305,17 @@ int main(int argc, char **argv){
              
                 
                 
-                brutes[pointer_vr++] = byte;
-                brutes[pointer_vr++] = next;
+                brutes[pointer_vr++] = byte;//le pointeur d'incrémente à chaque stockage
+                byte = next;
+                next = fgetc(fptr);//avancer  toujours d'un pas
+                
+                
+                
                 //valeur de pointeur s'incrémente à chaque fois
                     
                 
                 
-                byte = fgetc(fptr);
-                next = fgetc(fptr);
+              
                 if (pointer_vr >= cap){
                     //si la taille ne semble pas suffisante,on double la taille
                     cap <<=1;
