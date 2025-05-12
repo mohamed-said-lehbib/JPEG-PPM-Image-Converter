@@ -4,21 +4,52 @@
 #include "decde_Huff.h"
 
 
-// Création d'un noeud
+// creation d'un noeud
 Huff_arb *create_node() {
     Huff_arb* noeud = malloc(sizeof(Huff_arb)); 
-    noeud->est_mot_de_code = 0;
-    noeud->symbole = 0;
-    noeud->fg = NULL;
-    noeud->fd = NULL;
+    noeud->est_mot_de_code = 0;// valant 1 s'il s'agit d'un mot de code 
+    noeud->symbole = 0;// le symbole stocke dans le feuille et code par un mot de code qui est represente par le chemin de la racine vers la feuille
+    noeud->fg = NULL;// fils gauche
+    noeud->fd = NULL;// fils droit
     return noeud;
 }
+// decode_bloc : elle prend en parametre l'arbre de decodage dc et ac, le flux de bits et la taille du bloc
+// elle parcourt le flux de bits et decode les coefficients DC et AC , des qu'elle remplis un un vecteur de 64 coefficients, elle l'ajoute dans le tableau de blocs
+// et elle passe au vecteur suivant
+int **decode_bloc(Huff_arb *arbre_dc, Huff_arb *arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy) {
+    int **bloc = malloc(nb_mcux*nb_mcuy* sizeof(int*));//allocation de la memoire pour le tableau de blocs
+    for (int i = 0; i < nb_mcux*nb_mcuy; i++) {
+        bloc[i] = malloc(64 * sizeof(int));
+    }
+    uint16_t blo_idx = 0;
+    while (blo_idx < nb_mcux*nb_mcuy && bs->octet_posi < bs->size) {// tant qu'on a pas consomme le flux de bits
+        if (blo_idx == 0){
+            bloc[blo_idx][0] = decode_dc(arbre_dc, 0, bs);// le premier bloc n'a pas de valeur dc initiale
+        }
+        else {
+            bloc[blo_idx][0] = decode_dc(arbre_dc,bloc[blo_idx-1][0], bs);
+        }
+        int *coeffs_ac = decode_all_ac(arbre_ac, bs);// decodage des coefficients ac ( return 63 coefficients)
+        for (int j = 1; j < 64; j++) {
+            bloc[blo_idx][j] = coeffs_ac[j-1];
+        }
+        free(coeffs_ac);// On libere la memoire allouee pour les coefficients ac
+        
+        blo_idx++;
+    }
+    
+    return bloc;// renvoie le tableau de blocs
 
-// Insertion d'un mot de code
+    }
+
+
+// insert_code : elle prend en parametre l'arbre de decodage, le code, le symbole et la longueur du code
+// elle insere le code dans l'arbre de decodage en suivant le chemin de la racine vers la feuille
+// elle cree un noeud pour chaque bit du code et elle stocke le symbole dans la feuille
 void insert_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur) {
     Huff_arb *courrent = arbre; 
     for (int i = longueur - 1; i >= 0; i--) {
-        uint8_t bit = (code >> i) & 1;
+        uint8_t bit = (code >> i) & 1;// lecture de code bit par bit
         if (bit == 0) {
             if (!courrent->fg) courrent->fg = create_node();
             courrent = courrent->fg;
@@ -28,82 +59,84 @@ void insert_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longu
         }
     }
   
-    courrent->est_mot_de_code = 1;
-    courrent->symbole = symbole;
+    courrent->est_mot_de_code = 1;// on a atteint une feuille , donc on passe a 1 
+    courrent->symbole = symbole;// on stocke le symbole dans la feuille
 }
+// afficher_arbre : elle prend en parametre l'arbre de decodage
+// elle affiche l'arbre de decodage d'une maniere recursive
+// elle nous etait utile pour deboguer l'arbre de decodage
 void afficher_arbre(Huff_arb *arbre) {
-    if (arbre == NULL) return;
+    if (arbre == NULL) return;// si l'arbre est vide, on ne fait rien
 
     if (arbre->est_mot_de_code) {
-        printf("Feuille: symbole = 0x%02X\n", arbre->symbole);
+        printf("mot de code: 0x%x\n", arbre->symbole);
     } else {
-        printf("Noeud interne\n");
+        printf("noeud vide \n");
     }
 
-    afficher_arbre(arbre->fg); 
-    afficher_arbre(arbre->fd); 
+    afficher_arbre(arbre->fg); // afficher le fils gauche
+    afficher_arbre(arbre->fd); // afficher le fils droits
 }
 
-// Décodage du coefficient DC
+// decode_dc : elle prend en parametre l'arbre de decodage, la valeur dc initiale et le flux de bits
+// elle decode la valeur dc en parcourant l'arbre de decodage et en lisant les bits du flux de bits
 int decode_dc(Huff_arb *arbre, int dc_init, BitStream *bs) {
     if (arbre == NULL || bs == NULL) {
-        fprintf(stderr, "Erreur : arbre Huffman ou BitStream NULL dans decode_dc\n");
+        fprintf(stderr, " l'arbre ou le flux debit est nulle \n");
         exit(EXIT_FAILURE);
     }
     Huff_arb *courant = arbre;
-    while (courant->est_mot_de_code == 0) {
-        int bit = read_bit(bs);
+    while (courant->est_mot_de_code == 0) {//tant qu'on n'est pas sur un mot de code
+        int bit = read_bits(bs,1);// on lit le flux bit par bit
         if (bit == 0) {
             if (courant->fg == NULL) {
-                fprintf(stderr, "Erreur : noeud gauche NULL dans decode_dc\n");
+                fprintf(stderr, "noeud gauche NULL dans decode_dc\n");
                 exit(EXIT_FAILURE);
             }
             courant = courant->fg;
         } else {
             if (courant->fd == NULL) {
-                fprintf(stderr, "Erreur : noeud droit NULL dans decode_dc\n");
+                fprintf(stderr, "noeud droit NULL dans decode_dc\n");
                 exit(EXIT_FAILURE);
             }
             courant = courant->fd;
         }
     }
-    int m = courant->symbole;
-    int indice = read_bits(bs, m);
+    int m = courant->symbole;// le symbole recupere est la magnitude
+    int indice = read_bits(bs, m);//on lit m fois bits suivant repransentant l'indice du coefficient dc dans la classe de magnitude
     int DC = 0;
     if (m == 0) {
-        DC = dc_init;
+        DC = dc_init;// si m = 0, on ne change pas la valeur dc
     }
     else if ((indice >> (m - 1)) & 1) {
-        DC = indice + dc_init;
-    }
+        DC = indice + dc_init;// si le premier bit est 1, alors l'element cherche est l'indice lui meme puisque on est sur la deusieme moitie de la classe de magnitude 
+    }//on prend tjrs en compte le dc initiale
     else {
-        DC = indice - (1 << m) + 1;
+        DC = indice - (1 << m) + 1;// sinon , l'element cherche se trouve a une distance de indice + 1 de -2^(m-1) 
         DC = DC + dc_init;
     }
     return DC;
 }
 
-// Décodage de tous les coefficients AC
+// decode_all_ac : elle prend en parametre l'arbre de decodage et le flux de bits
+// elle decode les coefficients ac en parcourant l'arbre de decodage et en lisant les bits du flux de bits
+// elle renvoie un tableau de 63 coefficients ac
 int* decode_all_ac(Huff_arb *arbre, BitStream *bs) {
     int *coef_ac = malloc(63 * sizeof(int));
-    if (coef_ac == NULL) {
-        fprintf(stderr, "erreur d'allocation memoire pour les coefficients AC\n");
-        exit(1); 
-    }
 
     int k = 0;
     while (k < 63) {
         Huff_arb *courant = arbre;
         while (!courant->est_mot_de_code) {
-            int bit = read_bit(bs);
-            courant = (bit == 0) ? courant->fg : courant->fd;
+            int bit = read_bits(bs,1);// on lit le flux bit par bit
+            courant = (bit == 0) ? courant->fg : courant->fd;// on avance dans l'arbre de decodage
         }
 
-        int symbol = courant->symbole;
-        int rle = symbol >> 4;  
+        int symbol = courant->symbole;// on tombe sur le symbole qui contien la magnitude et le rle
+        int rle = symbol >> 4;  // le rle est stocke dans les 4 premiers bits( representant le nombre de zeros a ajouter avant le coefficient non nul suivant)
         int m = symbol & 0x0F;  // la magnitude
 
-        //fin de la séquence (0x00)
+        //Des qu'on trouve 0 c'est fini , tout les coefficients restants sont nuls, car si non , il  devrait etre cache dans le rle du prochaine coef non nul 
         if (symbol == 0x00) {
             while (k < 63) coef_ac[k++] = 0;
             break;
@@ -120,43 +153,16 @@ int* decode_all_ac(Huff_arb *arbre, BitStream *bs) {
         int indice = read_bits(bs, m);
         int AC = ((indice >> (m - 1)) & 1) ? indice : indice - (1 << m) + 1;
 
-
+        // remplir rle fois 0 avant le ac 
         for (int i = 0; i < rle; i++) coef_ac[k++] = 0;
         coef_ac[k++] = AC;
     }
 
     return coef_ac;
 }
-int **decode_bloc(Huff_arb *arbre_dc, Huff_arb *arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy) {
-    int **bloc = malloc(nb_mcux*nb_mcuy* sizeof(int*));
-    for (int i = 0; i < nb_mcux*nb_mcuy; i++) {
-        bloc[i] = malloc(64 * sizeof(int));
-        printf("\n nouveau bloc");
-    }
-    uint16_t blo_idx = 0;
-    while (blo_idx < nb_mcux*nb_mcuy && bs->octet_posi < bs->size) {
-        printf("\n nouveau bloc %d", blo_idx);
-        if (blo_idx == 0){
-            bloc[blo_idx][0] = decode_dc(arbre_dc, 0, bs);
-        }
-        else {
-            bloc[blo_idx][0] = decode_dc(arbre_dc,bloc[blo_idx-1][0], bs);
-        }
-        int *coeffs_ac = decode_all_ac(arbre_ac, bs);
-        for (int j = 1; j < 64; j++) {
-            bloc[blo_idx][j] = coeffs_ac[j-1];
-        }
-        free(coeffs_ac);
-        
-        blo_idx++;
-    }
-    
-    return bloc;
-
-    }
 
     
-
+//libere la memoire allouee pour l'arbre de decodage
 void free_arbre(Huff_arb *arbre) {
     if (!arbre) return;
     free_arbre(arbre->fg);
