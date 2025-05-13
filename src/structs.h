@@ -33,17 +33,29 @@ typedef struct {
 } infos_comp;
 
 
+// structure un seul block
+typedef struct {
+    uint16_t** tab;
+} block8;
+
+
+// // Structure plusieure blocks
+// typedef struct {
+//     block8 ** Blocks;
+// } blocks;
+
+
 // Composantes Y Cb Cr
 typedef struct {
-    uint16_t****** Y;  //N'ayez pas peur
-    uint16_t****** Cb1;
-    uint16_t****** Cr1;
+    block8** Y;  
+    block8** Cb1;
+    block8** Cr1;
 } YCbCrstr;
 
 
 // MCUs
 typedef struct {
-    uint16_t **** mcu;
+    YCbCrstr* mcu;
 } Mcu;
 
 #endif
