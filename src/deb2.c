@@ -345,8 +345,9 @@ int main(int argc, char **argv){
     uint8_t *symbols_ac= huff_ac[0]->symboles;
 
 // remplir l'arbre dc
-    uint16_t nb_mcux = largeur / 8;
-    uint16_t nb_mcuy = hauteur /8;
+
+    uint16_t nb_mcux = (largeur+7) / 8;
+    uint16_t nb_mcuy = (hauteur+7) /8;//aboir le prochain multiple de 8
     printf("\n%d ,%d\n ", nb_mcux,nb_mcuy);
     uint16_t code = 0;
     int k = 0;
@@ -438,7 +439,7 @@ int main(int argc, char **argv){
 //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
     
     
-    transf_pgm(idct, "gris.pgm",nb_mcux,nb_mcuy);
+    transf_pgm(idct, "albert.pgm",largeur,hauteur);
     
     //---------------------------FIN--------------------------------------------------------------
 
