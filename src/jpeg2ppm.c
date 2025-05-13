@@ -8,7 +8,7 @@
 #include <string.h>
 #include "quant_inverse.h"
 #include "lec_ppm.h"
-
+uint8_t *get_indices(SOS_val **sos_table){}
 int main(int argc, char **argv){
     if( argc != 2){//s'assure du nombre du paramètres
         return 1;
@@ -334,112 +334,208 @@ int main(int argc, char **argv){
         }
     //extraction des données brutes
     //--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
+    printf( " hello");
+    uint16_t nb_mcux = (largeur+7) /8;
+    uint16_t nb_mcuy = (hauteur+7) /8;
+    Huff_arb **arbres_dc=malloc(dc*sizeof(huff_tbl));
+    Huff_arb **arbres_ac = malloc(ac*sizeof(huff_tbl));
+    //remplir les arbres db
+    for (int i=0;i<dc ; i++){
+        Huff_arb *arbre_dc = create_node();
+    
+      
+        uint8_t *table_dc = huff_dc[i]->lengths;
 
-    Huff_arb *arbre_dc = create_node();
-    Huff_arb *arbre_ac = create_node();
-    uint16_t nb_symbols_dc =huff_dc[0]->nb_symb ; 
-    uint8_t *table_dc = huff_dc[0]->lengths;
-    uint16_t nb_symbols_ac = huff_ac[0]->nb_symb; 
-    uint8_t *table_ac = huff_ac[0]->lengths;
-    uint8_t *symbols_dc= huff_dc[0]->symboles;
-    uint8_t *symbols_ac= huff_ac[0]->symboles;
+        uint8_t *symbols_dc = huff_dc[i]->symboles;
+        uint16_t code = 0;
+        int k = 0;
+        for (int i = 0; i < 16; i++) {
+            int len = i + 1;
+            for (int j = 0; j < table_dc[i]; j++) {
+                insert_code(arbre_dc, code, symbols_dc[k], len);
+                code++;
+                k++;
+            }
+            code <<= 1;
+            
+        }
+        arbres_dc[i] = arbre_dc;
+    } 
 
-// remplir l'arbre dc
+    for (int i=0;i<ac ; i++){
+        Huff_arb *arbre_ac = create_node();
+    
+        
+        uint8_t *table_ac = huff_ac[i]->lengths;
 
-    uint16_t nb_mcux = (largeur+7) / 8;
-    uint16_t nb_mcuy = (hauteur+7) /8;//aboir le prochain multiple de 8
-    printf("\n%d ,%d\n ", nb_mcux,nb_mcuy);
+        uint8_t *symbols_ac = huff_ac[i]->symboles;
+        uint16_t code = 0;
+        int k = 0;
+        for (int i = 0; i < 16; i++) {
+            int len = i + 1;
+            for (int j = 0; j < table_ac[i]; j++) {
+                insert_code(arbre_ac, code, symbols_ac[k], len);
+                code++;
+                k++;
+            }
+            code <<= 1;
+            
+        }
+        arbres_ac[i] = arbre_ac;
+    } 
+    uint8_t *huff_corr_dc = malloc(N_comp*sizeof(uint8_t));//table de huffman correspondant dc
+
+    uint8_t *huff_corr_ac = malloc(N_comp*sizeof(uint8_t));
+    for (int i=0;i<N_comp;i++){
+        for (int j=0;j<N_comp_sos;j++){
+            if (sos_table[j]->i_c == infos_img[i]->i_c){
+                huff_corr_dc[i] = sos_table[j]->i_dc;
+                huff_corr_ac[i] = sos_table[j]->i_ac;
+                break;
+            }
+        }
+    }
+    printf( " hello ");
+
+  /*  Huff_arb *arbre_dc_0 = create_node();
+    Huff_arb *arbre_ac_0 = create_node();
+    Huff_arb *arbre_dc_1 = create_node();
+    Huff_arb *arbre_ac_1 = create_node();
+    uint8_t *table_dc_0 = huff_dc[0]->lengths;
+    uint8_t *table_ac_0 = huff_ac[0]->lengths;
+    uint8_t *symbols_dc_0 = huff_dc[0]->symboles;
+    uint8_t *symbols_ac_0 = huff_ac[0]->symboles;
+
+
+    if ( N_comp != 1 ){
+        uint8_t *table_dc_1 = huff_dc[1]->lengths;
+        uint8_t *table_ac_1 = huff_ac[1]->lengths;
+        uint8_t *symbols_dc_1 = huff_dc[1]->symboles;
+        uint8_t *symbols_ac_1 = huff_ac[1]->symboles;
+        uint16_t code = 0;
+        int k = 0;
+        for (int i = 0; i < 16; i++) {
+            int len = i + 1;
+            for (int j = 0; j < table_dc_1[i]; j++) {
+                insert_code(arbre_dc_1, code, symbols_dc_1[k], len);
+                code++;
+                k++;
+            }
+            code <<= 1;
+    
+        code = 0; k = 0;
+        for (int i = 0; i < 16; i++) {
+            int len = i + 1;
+            for (int j = 0; j < table_ac_1[i]; j++) {
+                insert_code(arbre_ac_1, code, symbols_ac_1[k], len);
+                code++;
+                k++;
+            }
+            code <<= 1;
+        
+
+    }}}
+
+
+
+
     uint16_t code = 0;
     int k = 0;
+    
     for (int i = 0; i < 16; i++) {
         int len = i + 1;
-        for (int j = 0; j < table_dc[i]; j++) {
-            insert_code(arbre_dc, code, symbols_dc[k], len);
+        for (int j = 0; j < table_dc_0[i]; j++) {
+            insert_code(arbre_dc_0, code, symbols_dc_0[k], len);
             code++;
             k++;
         }
         code <<= 1;
     }
-// remplir l'arbre AC
+
     code = 0; k = 0;
     for (int i = 0; i < 16; i++) {
         int len = i + 1;
-        for (int j = 0; j < table_ac[i]; j++) {
-            insert_code(arbre_ac, code, symbols_ac[k], len);
+        for (int j = 0; j < table_ac_0[i]; j++) {
+            insert_code(arbre_ac_0, code, symbols_ac_0[k], len);
             code++;
             k++;
         }
         code <<= 1;
-    }
-
-
+  
+   
+*/
     BitStream bs;
     create_bitstream(&bs, brutes, N_brute);
-    int **blocs = decode_bloc(arbre_dc, arbre_ac, &bs ,nb_mcux,nb_mcuy);
-
-    for(int i=0 ; i<1 ; i++){
-        printf("\nBLOC\n");
-        for (int j =0; j<64;j++){
-            printf( "%x ", blocs[i][j]);
-         }
-    }
+    int ***blocs = decode_bloc(arbres_dc, arbres_ac, &bs ,nb_mcux,nb_mcuy, N_comp,huff_corr_dc,huff_corr_ac);
+ 
+ 
     
-
-   
-
-
  
 //   ------------------------------------Quantification inverse ----------------------------------------
+    
+    uint8_t *qt_corr = malloc(N_comp*sizeof(uint8_t)); 
+    for (int i=0;i<N_comp;i++){
+        qt_corr[i] = infos_img[i]->i_q;
+    }
     for (int i=0 ; i<nb_mcux*nb_mcuy ; i++){
-        quant_inverse(blocs[i],tables[infos_img[0]->i_q]);
+        for( int j = 0; j<N_comp; j++){
+            quant_inverse(blocs[i][j],tables[infos_img[j]->i_q]);
+        }
         
     }
+    // for (int i= 0; i<3 ; i++){
+    //     printf( " mcu \n:");
+    //     for ( int j =0; j<3; j++){
+    //         printf( " bloc :\n");
+    //         for (int k=0; k<64 ; k++){
+    //             printf( "%x ", blocs[i][j][k]);
+    //         }
+    //     }
+    // }
 
-  for(int i=0 ; i<1 ; i++){
-        printf("\nquant\n");
-        for (int j =0; j<64;j++){
-            printf( "%x ", blocs[i][j]);
-         }
-    }
 
-    
-
-    
 
  
-//------------------------------------Zigzg inverse ----------------------------------------
-    printf("je sui la \n ");
-    int16_t **izz = malloc(nb_mcux*nb_mcuy*sizeof(int16_t *));
+// //------------------------------------Zigzg inverse ----------------------------------------
+//     printf("je sui la \n ");
+//     int16_t **izz = malloc(nb_mcux*nb_mcuy*sizeof(int16_t *));
+//     for (int i=0 ; i<nb_mcux*nb_mcuy ; i++){
+//         izz[i] = zigzag_inv(blocs[i]);
+    int16_t ***izz = malloc(nb_mcux*nb_mcuy*sizeof(int16_t **));
     for (int i=0 ; i<nb_mcux*nb_mcuy ; i++){
-        izz[i] = zigzag_inv(blocs[i]);
+        for( int j = 0; j<N_comp; j++){
+            izz;
+            izz[i][j]=zigzag_inv(blocs[i][j]);
+        }
         
     }
+    for (int i= 0; i<3 ; i++){
+        printf( " mcu \n");
+        for ( int j =0; j<3; j++){
+            printf( " bloc :\n");
+           
+            for (int k=0; k<64 ; k++){
+                printf( "%02x ", izz[i][j][k]);
+            }
+        }
+    }
+
+//     }
+
   
-     for(int i=0 ; i<1 ; i++){
-        printf("\nizz\n");
-        for (int j =0; j<64;j++){
-            printf( "%x ", izz[i][j]);
-         }
-    }
+    
+// //------------------------------------IDCT---------------------------------------------------------
+//     uint8_t **idct = malloc(nb_mcux*nb_mcuy*sizeof(uint8_t *));
+//     for (int k=0 ; k<nb_mcux*nb_mcuy ; k++){
+//         idct[k] = iDCT(izz[k]);
+//     }
+    
+    
 
-//------------------------------------IDCT---------------------------------------------------------
-    uint8_t **idct = malloc(nb_mcux*nb_mcuy*sizeof(uint8_t *));
-    for (int k=0 ; k<nb_mcux*nb_mcuy ; k++){
-        idct[k] = iDCT(izz[k]);
-    }
-    
-     for(int i=0 ; i<1 ; i++){
-        printf("\nidct\n");
-        for (int j =0; j<64;j++){
-            printf( "%02x ", idct[i][j]);
-            if((j+1)%8==0) printf("\n");
-         }
-    }
-
-//------------------------------------Ecriture dans le fichier PPM -------------------------------------------
+// //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
     
     
-    transf_pgm(idct, "albert.pgm",largeur,hauteur);
+//     transf_pgm(idct, "bisou.pgm",largeur,hauteur);
     
     //---------------------------FIN--------------------------------------------------------------
 
