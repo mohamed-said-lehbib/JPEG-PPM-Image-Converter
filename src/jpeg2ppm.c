@@ -7,7 +7,7 @@
 #include "structs.h"
 #include <string.h>
 #include "quant_inverse.h"
-
+#include "YCbCr2RGB.h"
 #include "ecriture_ppm.h"
 
 uint8_t *get_indices(SOS_val **sos_table) {}
@@ -545,7 +545,7 @@ int main(int argc, char **argv)
             idct[i][j] = iDCT(izz[i][j]);
         }
     }
-
+    printf("done");
     // //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
 
    /* for (int i = 0; i < 3; i++)
@@ -561,8 +561,16 @@ int main(int argc, char **argv)
             }}
         }
     }*/
-   
-    transf_pgm(idct, "zigzag.pgm",nb_mcux,nb_mcuy);
+   if (N_comp == 1){
+    transf_pgm(idct, "zigzag.pgm",largeur,hauteur);
+   }
+    else{uint32_t ***colore = malloc(nb_mcux*nb_mcuy*sizeof(uint32_t **));
+         for (int i = 0; i < nb_mcux * nb_mcuy; i++){
+       
+        
+        colore[i]= YCbCr2RGB(idct[i]);
+        }
+    transf_ppm(colore, "zigzag.pgm",largeur,hauteur);}
 
     //---------------------------FIN--------------------------------------------------------------
 
