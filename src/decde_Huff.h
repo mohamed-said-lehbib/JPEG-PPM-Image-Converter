@@ -8,9 +8,11 @@ typedef struct Huff_arb {
     uint8_t symbole;
     struct Huff_arb *fg, *fd;
 } Huff_arb;
-
 typedef struct {
-    int8_t data[64];
+    int16_t** data;
+} matrice ;
+typedef struct {
+    int16_t data[64];
 } Bloc;// definir une structure Bloc qui contient un tableau qui stocke les coefficient d'un bloc apres le decodage de Huffman 
 typedef struct {
     uint8_t nb_bloc ; 

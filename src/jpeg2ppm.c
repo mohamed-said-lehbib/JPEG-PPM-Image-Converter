@@ -425,54 +425,46 @@ int main(int argc, char **argv)
     create_bitstream(&bs, brutes, N_brute);
     MCU *blocs = decode_bloc(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
     printf( " \nhi\n");
+    
+
+    //   ------------------------------------Quantification inverse ----------------------------------------
+    uint8_t *qt_corr = malloc(N_comp * sizeof(uint8_t));
+    for (int i = 0; i < N_comp; i++)
+    {
+        qt_corr[i] = infos_img[i]->i_q;
+    }
+    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+    {
+        for (int j = 0; j < N_comp; j++)
+        {  for (int k =0 ;k<nb[j];k++){
+            quant_inverse(&blocs[i].comps[j].blocs[k], tables[infos_img[j]->i_q]);
+        }
+    }}
+    printf( " \nhi\n");
     // for ( int i =0 ;i< 3 ; i++ ){
     //     for( int j =0 ; j<64 ; j++){
-    //         printf("%x ", blocs[0][i][0][j]);
+    //         printf("%x ", blocs[0].comps[i].blocs[0].data[j]);
     //     }
     // }
 
-//     //   ------------------------------------Quantification inverse ----------------------------------------
-//     uint8_t *qt_corr = malloc(N_comp * sizeof(uint8_t));
-//     for (int i = 0; i < N_comp; i++)
-//     {
-//         qt_corr[i] = infos_img[i]->i_q;
-//     }
-//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-//     {
-//         for (int j = 0; j < N_comp; j++)
-//         { 
-//             quant_inverse(blocs[i][j][0], tables[infos_img[j]->i_q]);
-//         }
-//     }
 
-//     // for ( int i =0 ;i< 3 ; i++ ){
-//     //     for( int j =0 ; j<64 ; j++){
-//     //         printf("%x ", blocs[0][i][0][j]);
-//     //     }
-//     // }
 //     // // //------------------------------------Zigzg inverse ----------------------------------------
-//     int16_t *****izz = malloc(nb_mcux * nb_mcuy * sizeof(int16_t ****));
-//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-//     {
-//         izz[i] = malloc(N_comp * sizeof(int16_t ***));
-//         for (int j = 0; j < N_comp; j++){
-//             izz[i][j] = malloc(nb[j] * sizeof(int16_t **));
-//             for( int k=0 ; k< nb[j];k++){
-//             izz[i][j][k] = malloc(8 * sizeof(int16_t*));
-//             for (int l = 0; l < 8; l++)
-//                 {
-//                     izz[i][j][k][l] = malloc(8 * sizeof(int16_t));
-//                 }
-//         }
-//     }}
-//     printf( " \nhi\n");
-//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-//     {
-//         for (int j = 0; j < N_comp; j++)
-//         {   for( int k=0 ; k<nb[j] ; k++){
-//             izz[i][j][k] = zigzag_inv(blocs[i][j][k]);
-//         }
-//     }}
+    matrice ***izz = malloc(nb_mcux * nb_mcuy * sizeof(matrice **));
+    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+    {
+        izz[i] = malloc(N_comp * sizeof(matrice *));
+        for (int j = 0; j < N_comp; j++){
+            izz[i][j] = malloc(nb[j] * sizeof(matrice));
+        }
+    }
+    printf( " \nhi\n");
+    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+    {
+        for (int j = 0; j < N_comp; j++)
+        {   for( int k=0 ; k<nb[j] ; k++){
+            izz[i][j]->data = zigzag_inv(&blocs[i].comps[j].blocs[k]);
+        }
+    }}
    
 
     
