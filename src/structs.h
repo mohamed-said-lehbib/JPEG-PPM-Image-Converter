@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+
 //valeurs de la section sos
 typedef struct{
     uint8_t i_c;
@@ -33,29 +34,20 @@ typedef struct {
 } infos_comp;
 
 
-// structure un seul block
-typedef struct {
-    uint16_t** tab;
-} block8;
-
-
-// // Structure plusieure blocks
-// typedef struct {
-//     block8 ** Blocks;
-// } blocks;
-
-
 // Composantes Y Cb Cr
-typedef struct {
-    block8** Y;  
-    block8** Cb1;
-    block8** Cr1;
-} YCbCrstr;
+// typedef struct {
+//     block8** Y;  
+//     block8** Cb1;
+//     block8** Cr1;
+// } YCbCrstr;
+//typedef struct {
+//     uint8_t** mat;
+// } block8x8;
 
 
-// MCUs
-typedef struct {
-    YCbCrstr* mcu;
-} Mcu;
+// // MCUs
+// typedef struct {
+//     YCbCrstr* mcu;
+// } Mcu;
 
 #endif

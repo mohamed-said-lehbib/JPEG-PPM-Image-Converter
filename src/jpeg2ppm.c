@@ -333,20 +333,22 @@ int main(int argc, char **argv)
         }
         byte = fgetc(fptr); // avancer vers le ff
         printf("end : %x\n", byte);
+     
     }
+    printf(" hello babies "); 
     // extraction des données brutes
     //--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
-    printf(" hello");
+    printf(" hello babies "); 
     int16_t nb_y = infos_img[0]->h_i * infos_img[0]->v_i;
-    uint16_t nb_cb = infos_img[1]->h_i * infos_img[1]->v_i;
-    uint16_t nb_cr = infos_img[2]->h_i * infos_img[2]->v_i;
+    uint16_t nb_cb = (N_comp!=1)?infos_img[1]->h_i * infos_img[1]->v_i:0;
+    uint16_t nb_cr = (N_comp!=1)?infos_img[2]->h_i * infos_img[2]->v_i:0;
     
     uint8_t hy = infos_img[0]->h_i; // recuperation des dimensions des composantes
     uint8_t vy = infos_img[0]->v_i;         
-    uint8_t hcb = infos_img[1]->h_i;
-    uint8_t vcb = infos_img[1]->v_i;    
-    uint8_t hcr = infos_img[2]->h_i;
-    uint8_t vcr = infos_img[2]->v_i; 
+    uint8_t hcb = (N_comp!=1)?infos_img[1]->h_i:0;
+    uint8_t vcb = (N_comp!=1)?infos_img[1]->v_i:0;    
+    uint8_t hcr = (N_comp!=1)?infos_img[2]->h_i:0;
+    uint8_t vcr = (N_comp!=1)?infos_img[2]->v_i:0; 
 
     uint16_t nb_mcux = (largeur + 7) / (8*infos_img[0]->h_i);
     uint16_t nb_mcuy = (hauteur + 7) / (8*infos_img[0]->v_i);
@@ -418,10 +420,10 @@ int main(int argc, char **argv)
     uint16_t nb[3] ={ nb_y,nb_cb,nb_cr} ;// nombre de composant par mcu
     printf(" hello %d , %d , %d ", nb[0],nb_cb,nb_cr);
     printf(" %d\n", nb_mcux*nb_mcuy);
-
+    printf( " \nhi\n");
     BitStream bs;
     create_bitstream(&bs, brutes, N_brute);
-    int ****blocs = decode_bloc(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
+    MCU *blocs = decode_bloc(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
     printf( " \nhi\n");
     // for ( int i =0 ;i< 3 ; i++ ){
     //     for( int j =0 ; j<64 ; j++){
@@ -429,115 +431,115 @@ int main(int argc, char **argv)
     //     }
     // }
 
-    //   ------------------------------------Quantification inverse ----------------------------------------
-    uint8_t *qt_corr = malloc(N_comp * sizeof(uint8_t));
-    for (int i = 0; i < N_comp; i++)
-    {
-        qt_corr[i] = infos_img[i]->i_q;
-    }
-    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-    {
-        for (int j = 0; j < N_comp; j++)
-        { 
-            quant_inverse(blocs[i][j][0], tables[infos_img[j]->i_q]);
-        }
-    }
+//     //   ------------------------------------Quantification inverse ----------------------------------------
+//     uint8_t *qt_corr = malloc(N_comp * sizeof(uint8_t));
+//     for (int i = 0; i < N_comp; i++)
+//     {
+//         qt_corr[i] = infos_img[i]->i_q;
+//     }
+//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+//     {
+//         for (int j = 0; j < N_comp; j++)
+//         { 
+//             quant_inverse(blocs[i][j][0], tables[infos_img[j]->i_q]);
+//         }
+//     }
 
-    // for ( int i =0 ;i< 3 ; i++ ){
-    //     for( int j =0 ; j<64 ; j++){
-    //         printf("%x ", blocs[0][i][0][j]);
-    //     }
-    // }
-    // // //------------------------------------Zigzg inverse ----------------------------------------
-    int16_t *****izz = malloc(nb_mcux * nb_mcuy * sizeof(int16_t ****));
-    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-    {
-        izz[i] = malloc(N_comp * sizeof(int16_t ***));
-        for (int j = 0; j < N_comp; j++){
-            izz[i][j] = malloc(nb[j] * sizeof(int16_t **));
-            for( int k=0 ; k< nb[j];k++){
-            izz[i][j][k] = malloc(8 * sizeof(int16_t*));
-            for (int l = 0; l < 8; l++)
-                {
-                    izz[i][j][k][l] = malloc(8 * sizeof(int16_t));
-                }
-        }
-    }}
-    printf( " \nhi\n");
-    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-    {
-        for (int j = 0; j < N_comp; j++)
-        {   for( int k=0 ; k<nb[j] ; k++){
-            izz[i][j][k] = zigzag_inv(blocs[i][j][k]);
-        }
-    }}
+//     // for ( int i =0 ;i< 3 ; i++ ){
+//     //     for( int j =0 ; j<64 ; j++){
+//     //         printf("%x ", blocs[0][i][0][j]);
+//     //     }
+//     // }
+//     // // //------------------------------------Zigzg inverse ----------------------------------------
+//     int16_t *****izz = malloc(nb_mcux * nb_mcuy * sizeof(int16_t ****));
+//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+//     {
+//         izz[i] = malloc(N_comp * sizeof(int16_t ***));
+//         for (int j = 0; j < N_comp; j++){
+//             izz[i][j] = malloc(nb[j] * sizeof(int16_t **));
+//             for( int k=0 ; k< nb[j];k++){
+//             izz[i][j][k] = malloc(8 * sizeof(int16_t*));
+//             for (int l = 0; l < 8; l++)
+//                 {
+//                     izz[i][j][k][l] = malloc(8 * sizeof(int16_t));
+//                 }
+//         }
+//     }}
+//     printf( " \nhi\n");
+//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+//     {
+//         for (int j = 0; j < N_comp; j++)
+//         {   for( int k=0 ; k<nb[j] ; k++){
+//             izz[i][j][k] = zigzag_inv(blocs[i][j][k]);
+//         }
+//     }}
    
 
     
 
-//    //------------------------------------IDCT---------------------------------------------------------
+// //    //------------------------------------IDCT---------------------------------------------------------
 
 
-    uint8_t *****idct = malloc(nb_mcux * nb_mcuy * sizeof(uint8_t ****));
-    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-    {
-        idct[i] = malloc(N_comp * sizeof(uint8_t ***));
-        for (int j = 0; j < N_comp; j++){
-            idct[i][j] = malloc(nb[j] * sizeof(uint8_t **));
-            for( int k=0 ; k< nb[j];k++){
-            idct[i][j][k] = malloc(8 * sizeof(uint8_t*));
-            for (int l = 0; l < 8; l++)
-                {
-                    idct[i][j][k][l] = malloc(8 * sizeof(uint8_t));
-                }
-        }
-    }}
-    printf( " \nhi\n");
-    for (int i = 0; i < nb_mcux * nb_mcuy; i++)
-    {
-        for (int j = 0; j < N_comp; j++)
-        {   for( int k=0 ; k<nb[j] ; k++){
-            idct[i][j][k] = iDCT(izz[i][j][k]);
-        }
-    }}
-    // for ( int i =0 ;i< N_comp ; i++ ){
-    //     printf("\ncomp\n");
-    //     for( int j =0 ; j<8 ; j++){
-    //         printf("\n");
-    //         for(int l= 0;l<8;l++){
-    //         printf("%x ", idct[0][i][0][j][l]);}
-    //     printf("\n");}
-    //     }
+//     uint8_t *****idct = malloc(nb_mcux * nb_mcuy * sizeof(uint8_t ****));
+//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+//     {
+//         idct[i] = malloc(N_comp * sizeof(uint8_t ***));
+//         for (int j = 0; j < N_comp; j++){
+//             idct[i][j] = malloc(nb[j] * sizeof(uint8_t **));
+//             for( int k=0 ; k< nb[j];k++){
+//             idct[i][j][k] = malloc(8 * sizeof(uint8_t*));
+//             for (int l = 0; l < 8; l++)
+//                 {
+//                     idct[i][j][k][l] = malloc(8 * sizeof(uint8_t));
+//                 }
+//         }
+//     }}
+//     printf( " \nhi\n");
+//     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
+//     {
+//         for (int j = 0; j < N_comp; j++)
+//         {   for( int k=0 ; k<nb[j] ; k++){
+//             idct[i][j][k] = iDCT(izz[i][j][k]);
+//         }
+//     }}
+//     // for ( int i =0 ;i< N_comp ; i++ ){
+//     //     printf("\ncomp\n");
+//     //     for( int j =0 ; j<8 ; j++){
+//     //         printf("\n");
+//     //         for(int l= 0;l<8;l++){
+//     //         printf("%x ", idct[0][i][0][j][l]);}
+//     //     printf("\n");}
+//     //     }
     
-    printf("done");
-    uint8_t ****imag_comps =  malloc(nb_mcuy*nb_mcux*sizeof(uint8_t ***));
+//     printf("done");
+//     uint8_t ****imag_comps =  malloc(nb_mcuy*nb_mcux*sizeof(uint8_t ***));
     
-    for(int i=0;i<nb_mcux*nb_mcuy;i++){
-        imag_comps[i] = malloc(N_comp*sizeof(uint8_t **));
-        for (int j=0;j<N_comp;j++){
-            imag_comps[i][j] = malloc(8*infos_img[j]->v_i * sizeof(uint8_t));
-            for (int k=0;k<8*infos_img[j]->v_i;k++){
-                imag_comps[i][j][k] = malloc(8*infos_img[j]->h_i * sizeof(uint8_t));
-                for(int l=0;l<8*infos_img[j]->h_i;l++){
-                    imag_comps[i][j][k][l] = idct[i][j][infos_img[j]->h_i*(k/8) + l/8 ][k%8][l%8];
-                }
-            }
-        }
-    }
-//     // //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
+//     for(int i=0;i<nb_mcux*nb_mcuy;i++){
+//         imag_comps[i] = malloc(N_comp*sizeof(uint8_t **));
+//         for (int j=0;j<N_comp;j++){
+//             imag_comps[i][j] = malloc(8*infos_img[j]->v_i * sizeof(uint8_t));
+//             for (int k=0;k<8*infos_img[j]->v_i;k++){
+//                 imag_comps[i][j][k] = malloc(8*infos_img[j]->h_i * sizeof(uint8_t));
+//                 for(int l=0;l<8*infos_img[j]->h_i;l++){
+//                     imag_comps[i][j][k][l] = idct[i][j][infos_img[j]->h_i*(k/8) + l/8 ][k%8][l%8];
+//                 }
+//             }
+//         }
+//     }
+// //     // //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
 
 
-   if (N_comp == 1){
-    transf_pgm(idct, "bisou.pgm",largeur,hauteur);
-   }
-    else{
-        uint32_t ****colore = malloc(nb_mcux*nb_mcuy*sizeof(uint32_t ***));
-        for (int i = 0; i < nb_mcux * nb_mcuy; i++){
-            colore = malloc(N_comp*sizeof(uint32_t **));
-            colore[i] = sur_ech_horiz(imag_comps[i],infos_img);
-            colore[i]= YCbCr2RGB(colore[i]);
-        }
-    transf_ppm(colore, "thams.ppm",largeur,hauteur);}
+//    if (N_comp == 1){
+//     transf_pgm(idct, "bisou.pgm",largeur,hauteur);
+//    }
+//     else{
+//         uint32_t ****colore = malloc(nb_mcux*nb_mcuy*sizeof(uint32_t ***));
+//         for (int i = 0; i < nb_mcux * nb_mcuy; i++){
+//             colore = malloc(N_comp*sizeof(uint32_t **));
+//             colore[i] = sur_ech_horiz(imag_comps[i],infos_img);
+//             colore[i]= YCbCr2RGB(colore[i]);
+//         }
+//     transf_ppm(colore, "thams.ppm",largeur,hauteur);}
 
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);
