@@ -16,52 +16,57 @@ Huff_arb *create_node() {
 // decode_bloc : elle prend en parametre l'arbre de decodage dc et ac, le flux de bits et la taille du bloc
 // elle parcourt le flux de bits et decode les coefficients DC et AC , des qu'elle remplis un un vecteur de 64 coefficients, elle l'ajoute dans le tableau de blocs
 // et elle passe au vecteur suivant
-int ***decode_bloc(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy, uint8_t N_comp,
-    uint8_t *huff_corr_dc,uint8_t *huff_corr_ac) {
-    int ***blocs = malloc(nb_mcux*nb_mcuy* sizeof(int**));//allocation de la memoire pour le tableau de blocs
+int ****decode_bloc(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy, uint8_t N_comp,
+    uint8_t *huff_corr_dc,uint8_t *huff_corr_ac , uint16_t nb[]) {
+    int ****blocs = malloc(nb_mcux*nb_mcuy* sizeof(int***));//allocation de la memoire pour le tableau de blocs
     
     for (int i = 0; i < nb_mcux*nb_mcuy; i++) {
-        blocs[i] = malloc(3 * sizeof(int *));
+        blocs[i] = malloc(3 * sizeof(int **));
         for (int j = 0 ; j< 3 ; j++){
-            blocs[i][j]= malloc(64* sizeof(int ));
+            blocs[i][j]=malloc(nb[j] * sizeof(int **));
+            for (int k =0 ; k<nb[j]; k++){
+            blocs[i][j][k]= malloc(64* sizeof(int ));}
         }
     }
     uint16_t blo_idx = 0;
     while (blo_idx < nb_mcux*nb_mcuy ) {// tant qu'on a pas consomme le flux de bits*
-       
-        for ( int comp = 0 ; comp < 3 ; comp++){  
+        // printf( " nouveau bloc %d", blo_idx);
+        for ( int comp = 0 ; comp < N_comp ; comp++){  
             if( comp != 0) {
-                if (blo_idx == 0){
-                    blocs[blo_idx][comp][0] = decode_dc(arbre_dc[huff_corr_dc[1]], 0, bs);// le premier bloc n'a pas de valeur dc initiale
-                }
-                else {
-                    blocs[blo_idx][comp][0] = decode_dc(arbre_dc[huff_corr_dc[1]],blocs[blo_idx - 1][comp][0], bs);
-                }
-                int *coeffs_ac = decode_all_ac(arbre_ac[huff_corr_ac[1]], bs);// decodage des coefficients ac ( return 63 coefficients)
-                for (int j = 1; j < 64; j++) {
-                    blocs[blo_idx][comp][j] = coeffs_ac[j-1];
-                }
-                free(coeffs_ac);
-            }
+                for ( int k=0 ; k<nb[comp];k++){
+                    if (blo_idx == 0){
+                        blocs[blo_idx][comp][k][0] = decode_dc(arbre_dc[huff_corr_dc[1]], 0, bs);// le premier bloc n'a pas de valeur dc initiale
+                    }
+                    else {
+                        blocs[blo_idx][comp][k][0] = decode_dc(arbre_dc[huff_corr_dc[1]],blocs[blo_idx - 1][comp][k][0], bs);
+                    }
+                    int *coeffs_ac = decode_all_ac(arbre_ac[huff_corr_ac[1]], bs);// decodage des coefficients ac ( return 63 coefficients)
+                    for (int j = 1; j < 64; j++) {
+                        blocs[blo_idx][comp][k][j] = coeffs_ac[j-1];
+                    }
+                    free(coeffs_ac);
+                    
+                      }}
             else {
-                if (blo_idx == 0){
-                    blocs[blo_idx][comp][0] = decode_dc(arbre_dc[huff_corr_dc[0]], 0, bs);// le premier bloc n'a pas de valeur dc initiale
-                }
-                else {
-                    blocs[blo_idx][comp][0] = decode_dc(arbre_dc[huff_corr_dc[0]],blocs[blo_idx-1][comp][0], bs);
-                }
-                int *coeffs_ac = decode_all_ac(arbre_ac[huff_corr_ac[0]], bs);// decodage des coefficients ac ( return 63 coefficients)
-                for (int j = 1; j < 64; j++) {
-                    blocs[blo_idx][comp][j] = coeffs_ac[j-1];
-                }
-                free(coeffs_ac);
-            }
+                for ( int k=0 ; k<nb[comp];k++){   
 
+                    if (blo_idx == 0){
+                        blocs[blo_idx][comp][k][0] = decode_dc(arbre_dc[huff_corr_dc[0]], 0, bs);// le premier bloc n'a pas de valeur dc initiale
+                    }
+                    else {
+                        blocs[blo_idx][comp][k][0] = decode_dc(arbre_dc[huff_corr_dc[0]],blocs[blo_idx-1][comp][k][0], bs);
+                    }
+                    int *coeffs_ac = decode_all_ac(arbre_ac[huff_corr_ac[0]], bs);// decodage des coefficients ac ( return 63 coefficients)
+                    for (int j = 1; j < 64; j++) {
+                        blocs[blo_idx][comp][k][j] = coeffs_ac[j-1];
+                    }
+                    free(coeffs_ac);
+            }}
         }
-        
+       
         blo_idx++;
     }
- 
+    if(bs->octet_posi>=bs->size){ printf(" je suis au bout ");}
     
     return blocs;// renvoie le tableau de blocs
 
