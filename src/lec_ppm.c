@@ -36,7 +36,7 @@
 // }
 
 
-void transf_pgm(uint8_t** t, const char* nom, uint16_t largeur, uint16_t hauteur) {
+void transf_pgm(uint8_t**** t, const char* nom, uint16_t largeur, uint16_t hauteur) {
     
     FILE *fichier = fopen(nom, "wb");
     if (!fichier) {
@@ -65,7 +65,7 @@ void transf_pgm(uint8_t** t, const char* nom, uint16_t largeur, uint16_t hauteur
                 
                 for (uint8_t j = 0; j < 8; j++) {
                     if( mcu_x*8 +j >= largeur){break;}
-                    b = (t[k][i * 8 + j] > 255) ? 255 : t[k][i * 8 + j];
+                    b = (t[k][0][i][j] > 255) ? 255 : t[k][i * 8 + j];
                     fwrite(&b, sizeof(uint8_t), 1, fichier);
                 }
             }

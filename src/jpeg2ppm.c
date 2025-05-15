@@ -541,6 +541,7 @@ int main(int argc, char **argv)
                 }
             }
         }
+<<<<<<< Updated upstream
     }
     for( int i =0 ; i<hauteur ; i++){
         for (int j =0 ; j<largeur ;j++){
@@ -549,6 +550,9 @@ int main(int argc, char **argv)
        printf( "\n");
         }
     transf_ppm(image, "heeeeeh.ppm",largeur,hauteur);
+=======
+    transf_ppm(colore, "biig.pgm",largeur,hauteur);}
+>>>>>>> Stashed changes
 
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);

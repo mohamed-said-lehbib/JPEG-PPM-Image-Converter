@@ -22,23 +22,18 @@ Huff_arb *create_node() {
     MCU *mcus = malloc(nb_mcux*nb_mcuy* sizeof(MCU));//allocation de la memoire pour le tableau de blocs
     
     for (int i = 0; i < nb_mcux*nb_mcuy; i++) {
-        mcus[i].nb_comp = N_comp;
-        mcus[i].comps = malloc(N_comp* sizeof(Comp));
-        for (int j = 0 ; j< N_comp ; j++){
-            mcus[i].comps[j].blocs=malloc(nb[j] * sizeof(Bloc));
-            mcus[i].comps[j].nb_bloc = nb[j];  
+        blocs[i] = malloc(3 * sizeof(int *));
+        for (int j = 0 ; j< 3 ; j++){
+            blocs[i][j]= malloc(64* sizeof(int ));
         }
     }
     uint32_t blo_idx = 0;
     while (blo_idx < nb_mcux*nb_mcuy ) {// tant qu'on a pas consomme le flux de bits*
-        //printf( " nouveau bloc %d", blo_idx);
-
-        for ( int comp = 0 ; comp < N_comp ; comp++){  
-            uint8_t idx_table_dc=huff_corr_dc[(comp==0)?0:1];
-            uint8_t idx_table_ac=huff_corr_ac[(comp==0)?0:1];
-            for ( int k=0 ; k<mcus[blo_idx].comps[comp].nb_bloc;k++){
-                if (k == 0){
-                    mcus[blo_idx].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], 0, bs);// le premier bloc n'a pas de valeur dc initiale
+       
+        for ( int comp = 0 ; comp < 3 ; comp++){  
+            if( comp != 0) {
+                if (blo_idx == 0){
+                    blocs[blo_idx][comp][0] = decode_dc(arbre_dc[huff_corr_dc[1]], 0, bs);// le premier bloc n'a pas de valeur dc initiale
                 }
                 else {
                     mcus[blo_idx].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], mcus[blo_idx].comps[comp].blocs[k-1].data[0], bs);
