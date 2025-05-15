@@ -29,7 +29,7 @@ Huff_arb *create_node() {
             mcus[i].comps[j].nb_bloc = nb[j];  
         }
     }
-    uint16_t blo_idx = 0;
+    uint32_t blo_idx = 0;
     while (blo_idx < nb_mcux*nb_mcuy ) {// tant qu'on a pas consomme le flux de bits*
         //printf( " nouveau bloc %d", blo_idx);
 

@@ -332,13 +332,13 @@ int main(int argc, char **argv)
             break; // fin de ecture
         }
         byte = fgetc(fptr); // avancer vers le ff
-        printf("end : %x\n", byte);
+    
      
     }
-    printf(" hello babies "); 
+
     // extraction des données brutes
     //--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
-    printf(" hello babies "); 
+
     int16_t nb_y = infos_img[0]->h_i * infos_img[0]->v_i;
     uint16_t nb_cb = (N_comp!=1)?infos_img[1]->h_i * infos_img[1]->v_i:0;
     uint16_t nb_cr = (N_comp!=1)?infos_img[2]->h_i * infos_img[2]->v_i:0;
@@ -350,8 +350,8 @@ int main(int argc, char **argv)
     uint8_t hcr = (N_comp!=1)?infos_img[2]->h_i:0;
     uint8_t vcr = (N_comp!=1)?infos_img[2]->v_i:0; 
 
-    uint16_t nb_mcux = (largeur + 7) / (8*infos_img[0]->h_i);
-    uint16_t nb_mcuy = (hauteur + 7) / (8*infos_img[0]->v_i);
+    uint16_t nb_mcux = (largeur + 7) / (8*hy);
+    uint16_t nb_mcuy = (hauteur + 7) / (8*vy);
     Huff_arb **arbres_dc = malloc(dc * sizeof(huff_tbl));
     Huff_arb **arbres_ac = malloc(ac * sizeof(huff_tbl));
     // remplir les arbres db
@@ -421,10 +421,11 @@ int main(int argc, char **argv)
     printf(" hello %d , %d , %d ", nb[0],nb_cb,nb_cr);
     printf(" %d\n", nb_mcux*nb_mcuy);
     printf( " \nhi\n");
+
     BitStream bs;
     create_bitstream(&bs, brutes, N_brute);
     MCU *blocs = decode_bloc(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
-    printf( " \nhi\n");
+
     
 
     //   ------------------------------------Quantification inverse ----------------------------------------
@@ -440,15 +441,15 @@ int main(int argc, char **argv)
             quant_inverse(&blocs[i].comps[j].blocs[k], tables[infos_img[j]->i_q]);
         }
     }}
-    printf( " \nhi\n");
+    printf( " \nhi hey\n");
     
 //     // // //------------------------------------Zigzg inverse ----------------------------------------
     
     //-----------------------Allocation de la memoire -----------------------------------//
-    matrice ***izz = malloc(nb_mcux  * sizeof(matrice **));
-    for (uint32_t i = 0; i < nb_mcux; i++){
-        izz[i] = malloc(nb_mcuy * sizeof(matrice *));
-        for (uint32_t j = 0; j < nb_mcuy; j++){
+    matrice ***izz = malloc(nb_mcuy  * sizeof(matrice **));
+    for (uint32_t i = 0; i < nb_mcuy; i++){
+        izz[i] = malloc(nb_mcux * sizeof(matrice *));
+        for (uint32_t j = 0; j < nb_mcux; j++){
             izz[i][j] = malloc(N_comp *sizeof(matrice));
             for (uint32_t k = 0; k < N_comp; k++){
                 izz[i][j][k].data=malloc(infos_img[k]->v_i*8*sizeof(int16_t*));
@@ -476,7 +477,7 @@ int main(int argc, char **argv)
                 }
                 for (int l= 0; l<8;l++ ){
                     for (int m=0;m<8;m++){
-                        izz[i/nb_mcuy][i%nb_mcuy][j].data[l+decaley][m+decalex] = zig[l][m];
+                        izz[i/nb_mcux][i%nb_mcux][j].data[l+decaley][m+decalex] = zig[l][m];
                     }
                 }
                 decalex+=8;
@@ -503,20 +504,20 @@ int main(int argc, char **argv)
 
 
    
-    for (uint32_t i = 0; i < nb_mcux; i++){
-        for (uint32_t j = 0; j < nb_mcuy; j++){
+    for (uint32_t i = 0; i < nb_mcuy; i++){
+        for (uint32_t j = 0; j < nb_mcux; j++){
             izz[i][j]=sur_ech_horiz(izz[i][j],infos_img);
         }
     }
  
     
-    for( int i =0 ; i<8 ; i++){
-        for (int j =0 ; j<16 ;j++){
+    // for( int i =0 ; i<8 ; i++){
+    //     for (int j =0 ; j<16 ;j++){
 
-       printf(" %04x ", (uint16_t)izz[0][0][0].data[i][j]);}
-       printf( "\n");
-    }
-    printf("done hh \n");
+    //    printf(" %04x ", (uint16_t)izz[0][0][1].data[i][j]);}
+    //    printf( "\n");
+    // }
+    // printf("done hh \n");
     
 // //     // //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
 
@@ -529,24 +530,25 @@ int main(int argc, char **argv)
     transf_pgm(izz, "bisou.pgm",largeur,hauteur);
    }
     else{
-        for (uint32_t i = 0; i < nb_mcux; i++){
-            for (uint32_t j = 0; j < nb_mcuy; j++){
+        for (uint32_t i = 0; i < nb_mcuy; i++){
+            for (uint32_t j = 0; j < nb_mcux; j++){
                 uint32_t** new = YCbCr2RGB(izz[i][j],hy,vy);
-                for (uint32_t k = 0; k < vy; k++){
-                    for (uint32_t l = 0; l < hy; l++){
-                        image[i*vy*8+k][j*hy*8+l]=new[k][l];
+                for (uint32_t k = 0; k < vy*8; k++){
+                    for (uint32_t l = 0; l < hy*8; l++){
+                        if (i*vy*8+k < hauteur && j*hy*8+l < largeur) {
+                        image[i*vy*8+k][j*hy*8+l]=new[k][l];}
                     }
                 }
             }
         }
     }
-    // for( int i =0 ; i<largeur ; i++){
-    //     for (int j =0 ; j<hauteur ;j++){
+    for( int i =0 ; i<hauteur ; i++){
+        for (int j =0 ; j<largeur ;j++){
 
-    //    printf(" %d ", image[i][j]);}
-    //    printf( "\n");
-    //     }
-    //transf_ppm(izz, "thams.ppm",largeur,hauteur, infos_img);
+       printf(" %x ", image[i][j]);}
+       printf( "\n");
+        }
+    transf_ppm(image, "heeeeeh.ppm",largeur,hauteur);
 
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);
