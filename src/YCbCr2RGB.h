@@ -3,4 +3,4 @@
 #include <stdint.h>
 
 
-uint32_t** YCbCr2RGB(uint8_t ***bloc);
+uint32_t** YCbCr2RGB(uint8_t ***bloc,uint8_t h,uint8_t v);

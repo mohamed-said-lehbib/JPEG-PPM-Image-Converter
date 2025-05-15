@@ -37,11 +37,11 @@ Huff_arb *create_node() {
             uint8_t idx_table_dc=huff_corr_dc[(comp==0)?0:1];
             uint8_t idx_table_ac=huff_corr_ac[(comp==0)?0:1];
             for ( int k=0 ; k<mcus[blo_idx].comps[comp].nb_bloc;k++){
-                if (blo_idx == 0){
+                if (k == 0){
                     mcus[blo_idx].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], 0, bs);// le premier bloc n'a pas de valeur dc initiale
                 }
                 else {
-                    mcus[blo_idx].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], mcus[blo_idx-1].comps[comp].blocs[k].data[0], bs);
+                    mcus[blo_idx].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], mcus[blo_idx].comps[comp].blocs[k-1].data[0], bs);
                 }
                 int *coeffs_ac = decode_all_ac(arbre_ac[idx_table_ac], bs);// decodage des coefficients ac ( return 63 coefficients)
                 for (int j = 1; j < 64; j++) {

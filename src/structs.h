@@ -34,6 +34,17 @@ typedef struct {
 } infos_comp;
 
 
+
+typedef struct {
+    int16_t** data;
+} matrice ;
+
+
+typedef struct {
+    matrice ycbcr[3];
+} Mcu;
+
+
 // Composantes Y Cb Cr
 // typedef struct {
 //     block8** Y;  
@@ -43,11 +54,11 @@ typedef struct {
 //typedef struct {
 //     uint8_t** mat;
 // } block8x8;
-
-
 // // MCUs
 // typedef struct {
 //     YCbCrstr* mcu;
 // } Mcu;
+
+
 
 #endif

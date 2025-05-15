@@ -3,16 +3,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-uint32_t*** YCbCr2RGB(uint8_t ***bloc){
+uint32_t** YCbCr2RGB(uint8_t ***bloc,uint8_t h,uint8_t v){
     uint8_t **Y = bloc[0];
     uint8_t **Cb = bloc[1];
     uint8_t **Cr = bloc[2];
-    uint32_t **pix = malloc(8*sizeof(uint32_t*));
-    for (int i =0; i < 8; i++){
-        pix[i]= malloc(8*sizeof(uint32_t));
+    uint32_t **pix= malloc(v*sizeof(uint32_t*));
+    for (int i =0; i < v; i++){
+        pix[i]= malloc(h*sizeof(uint32_t));
     }
-    for (uint16_t i  = 0; i < 8; i++){ 
-        for (uint16_t j  = 0; j < 8; j++){   
+    for (uint16_t i  = 0; i < v; i++){ 
+        for (uint16_t j  = 0; j < h; j++){   
             float y = Y[i][j];
             float cb = Cb[i][j] - 128;
             float cr = Cr[i][j] - 128;

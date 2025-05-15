@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-int16_t **zigzag_inv(int *quan_vect){
+int16_t **zigzag_inv(int16_t *quan_vect){
     uint8_t poin = 0; //indice dans le vectteur zigzagué
     
     uint8_t i =0;
@@ -11,9 +11,9 @@ int16_t **zigzag_inv(int *quan_vect){
     
         int16_t **table = malloc(8*sizeof(int16_t*));
         for (int i=0; i<8; i++){
-            table[i] = malloc(8*sizeof(uint8_t));
+            table[i] = malloc(8*sizeof(uint16_t));
         }
-        int *vect8 = quan_vect;
+        int16_t *vect8 = quan_vect;
         while( poin < 64){
             
             table[i][j] = vect8[poin];
