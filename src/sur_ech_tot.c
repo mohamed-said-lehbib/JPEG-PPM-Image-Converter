@@ -7,13 +7,13 @@
 extern uint16_t hauteur;
 extern uint16_t largeur;
 
-uint16_t ***sur_ech_horiz(uint16_t ***com, infos_comp **infos_img){
+umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
     
     //-----------recuperation des donnees------------------//
 
-    uint16_t **y = com[0];           //  recuperation des composantes
-    uint16_t **cb = com[1];
-    uint16_t **cr = com[2];
+    uint8_t **y = com[0].data;           //  recuperation des composantes
+    uint8_t **cb = com[1].data;
+    uint8_t **cr = com[2].data;
 
     uint8_t hy = 8*infos_img[0]->h_i; // recuperation des dimensions des composantes
     uint8_t vy = 8*infos_img[0]->v_i;         
@@ -27,11 +27,13 @@ uint16_t ***sur_ech_horiz(uint16_t ***com, infos_comp **infos_img){
 
     //--------------Allocation de l'espace ---------------//
 
-    uint16_t** new_cb_block = malloc(vcb*sizeof(uint16_t*));
-    uint16_t** new_cr_block = malloc(vcr*sizeof(uint16_t*));
+    umatrice new_cb_block ;
+    new_cb_block.data= malloc(vcb*sizeof(uint8_t*));
+    umatrice new_cr_block ;
+    new_cr_block.data= malloc(vcr*sizeof(uint8_t*));
     for (uint8_t i = 0; i < vcb; i++) {
-        new_cb_block[i] = malloc(hy * sizeof(uint16_t));
-        new_cr_block[i] = malloc(hy * sizeof(uint16_t));
+        new_cb_block.data[i] = malloc(hy * sizeof(uint8_t));
+        new_cr_block.data[i] = malloc(hy * sizeof(uint8_t));
     }
 
     //--------------remplissage de la mcu---------------//
@@ -43,7 +45,7 @@ uint16_t ***sur_ech_horiz(uint16_t ***com, infos_comp **infos_img){
         for (int j = 0 ; j<hcb; j++){
             decale = facteur_hcb*j;       // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
-                new_cb_block[i][k+decale] = cb[i][j];
+                new_cb_block.data[i][k+decale] = cb[i][j];
             }
         }
     }
@@ -54,7 +56,7 @@ uint16_t ***sur_ech_horiz(uint16_t ***com, infos_comp **infos_img){
             /*uint16_t valeur = cr[i][j];*/
             decale = facteur_hcb*j;       // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
-                new_cr_block[i][k+decale] = cr[i][j];
+                new_cr_block.data[i][k+decale] = cr[i][j];
             }
         }
     }
@@ -85,13 +87,13 @@ uint16_t ***sur_ech_horiz(uint16_t ***com, infos_comp **infos_img){
 
 
 
-uint16_t ***sur_ech_ver(uint16_t ***com, infos_comp **infos_img){
+umatrice*sur_ech_ver(umatrice*com, infos_comp **infos_img){
     
     //-----------recuperation des donnees------------------//
 
-    uint16_t **y = com[0];           //  recuperation des composantes
-    uint16_t **cb = com[1];
-    uint16_t **cr = com[2];
+    uint8_t **y = com[0].data;           //  recuperation des composantes
+    uint8_t **cb = com[1].data;
+    uint8_t **cr = com[2].data;
 
     uint8_t hy = infos_img[0]->h_i; // recuperation des dimensions des composantes
     uint8_t vy = infos_img[0]->v_i;         
@@ -105,12 +107,15 @@ uint16_t ***sur_ech_ver(uint16_t ***com, infos_comp **infos_img){
 
     //--------------Allocation de l'espace ---------------//
 
-    uint16_t** new_cb_block = malloc(vy*sizeof(uint16_t*));
-    uint16_t** new_cr_block = malloc(vy*sizeof(uint16_t*));
-    for (uint8_t i = 0; i < vy; i++) {
-        new_cb_block[i] = malloc(hcb * sizeof(uint16_t));
-        new_cr_block[i] = malloc(hcr * sizeof(uint16_t));
+    umatrice new_cb_block ;
+    new_cb_block.data= malloc(hcb*sizeof(uint8_t*));
+    umatrice new_cr_block ;
+    new_cr_block.data= malloc(hcr*sizeof(uint8_t*));
+    for (uint8_t i = 0; i < hcb; i++) {
+        new_cb_block.data[i] = malloc(vy * sizeof(uint8_t));
+        new_cr_block.data[i] = malloc(vy * sizeof(uint8_t));
     }
+
 
     //--------------remplissage de la mcu---------------//
 
@@ -124,7 +129,7 @@ uint16_t ***sur_ech_ver(uint16_t ***com, infos_comp **infos_img){
         for (int j = 0 ; j<hcb; j++){
             decale = facteur_vcb*i;       // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_vcb; k++){
-                new_cb_block[k+decale][j] = cb[i][j];
+                new_cb_block.data[k+decale][j] = cb[i][j];
             }
         }
     }
@@ -139,7 +144,7 @@ uint16_t ***sur_ech_ver(uint16_t ***com, infos_comp **infos_img){
             /*uint16_t valeur = cr[i][j];*/
             decale = facteur_vcr*i;       // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_vcr; k++){
-                new_cr_block[k+decale][j] = cr[i][j];
+                new_cr_block.data[k+decale][j] = cr[i][j];
             }
         }
     }
@@ -163,8 +168,7 @@ uint16_t ***sur_ech_ver(uint16_t ***com, infos_comp **infos_img){
 }
 
 
-
-uint16_t ***sur_ech(uint16_t ***com, infos_comp **infos_img){
+umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
 
     uint8_t hy = infos_img[0]->h_i; // recuperation des dimensions des composantes
     uint8_t vy = infos_img[0]->v_i;         
@@ -188,7 +192,7 @@ uint16_t ***sur_ech(uint16_t ***com, infos_comp **infos_img){
 
     //--------Cas de sous echantollage horizontalle et verticale-------------//
     else{
-        uint16_t*** new_com = sur_ech_horiz(com, infos_img);
+        umatrice* new_com = sur_ech_horiz(com, infos_img);
         return sur_ech_ver(new_com,infos_img);
     }
 

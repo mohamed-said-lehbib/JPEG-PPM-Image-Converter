@@ -7,6 +7,6 @@
 extern uint16_t hauteur;
 extern uint16_t largeur;
 
-uint16_t ***sur_ech_horiz(uint16_t ***com, infos_comp **infos_img);
-uint16_t ***sur_ech_ver(uint16_t ***com, infos_comp **infos_img);
-uint16_t ***sur_ech(uint16_t ***com, infos_comp **infos_img);
+umatrice* sur_ech_horiz(umatrice*com, infos_comp **infos_img);
+umatrice* sur_ech_ver(umatrice* com, infos_comp **infos_img);
+umatrice* sur_ech(umatrice* com, infos_comp **infos_img);

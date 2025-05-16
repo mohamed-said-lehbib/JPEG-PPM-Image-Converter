@@ -11,7 +11,7 @@ int16_t **zigzag_inv(int16_t *quan_vect){
     
         int16_t **table = malloc(8*sizeof(int16_t*));
         for (int i=0; i<8; i++){
-            table[i] = malloc(8*sizeof(uint16_t));
+            table[i] = malloc(8*sizeof(int16_t));
         }
         int16_t *vect8 = quan_vect;
         while( poin < 64){
