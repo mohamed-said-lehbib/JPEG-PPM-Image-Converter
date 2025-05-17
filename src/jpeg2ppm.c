@@ -426,7 +426,7 @@ int main(int argc, char **argv)
     
     uint16_t nb[3] ={ nb_y,nb_cb,nb_cr} ;// nombre de composant par mcu
     printf(" hello %d , %d , %d ,% d, %d", nb[0],nb_cb,nb_cr, nb_mcux, nb_mcuy);
-    printf(" %d\n", nb_mcux*nb_mcuy);
+    printf(" %d, %d, %d\n", nb_mcux*nb_mcuy, hy, vy);
     printf( " \nhi\n");
 
     BitStream bs;
@@ -452,7 +452,6 @@ int main(int argc, char **argv)
             quant_inverse(&blocs[i].comps[j].blocs[k], tables[infos_img[j]->i_q]);
         }
     }}
-    printf( " \nhi hey\n");
     
 
     
@@ -527,7 +526,7 @@ int main(int argc, char **argv)
     printf("avants \n");
     for (uint32_t i = 0; i < nb_mcuy; i++){
         for (uint32_t j = 0; j < nb_mcux; j++){
-            idct[i][j]=sur_ech_horiz(idct[i][j],infos_img);
+            idct[i][j]=sur_ech(idct[i][j],infos_img);
         }
     }
  
@@ -553,10 +552,21 @@ int main(int argc, char **argv)
     for(uint32_t i =0;i<hauteur;i++){
         image[i]=malloc(largeur*sizeof(uint32_t));
     }
-//    if (N_comp == 1){
-//     transf_pgm(izz, "bisou.pgm",largeur,hauteur);
-//    }
-    //else{
+   if (N_comp == 1){
+    for (uint32_t i = 0; i < nb_mcuy; i++){
+        for (uint32_t j = 0; j < nb_mcux; j++){
+            uint32_t*** new = idct[i][j];
+            for (uint32_t k = 0; k < vy*8; k++){
+                for (uint32_t l = 0; l < hy*8; l++){
+                    if (i*vy*8+k < hauteur && j*hy*8+l < largeur) {
+                    image[i*vy*8+k][j*hy*8+l]=new[0][k][l];}
+                }
+            }
+        }
+    }
+    transf_pgm(image, "bisou.pgm",largeur,hauteur);
+   }
+    else{
         for (uint32_t i = 0; i < nb_mcuy; i++){
             for (uint32_t j = 0; j < nb_mcux; j++){
                 uint32_t** new = YCbCr2RGB(idct[i][j],hy,vy);
@@ -568,14 +578,14 @@ int main(int argc, char **argv)
                 }
             }
         }
-  //  }
+    }
     // for( int i =0 ; i<hauteur ; i++){
     //     for (int j =0 ; j<largeur ;j++){
 
     //    printf(" %x ", image[i][j]);}
     //    printf( "\n");
     //     }
-    transf_ppm(image, "hhh.ppm",largeur,hauteur);
+    transf_ppm(image, "yaaaay.ppm",largeur,hauteur);
 
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);
