@@ -16,9 +16,9 @@ uint32_t** YCbCr2RGB(umatrice *bloc,uint8_t h,uint8_t v){
             float y = Y[i][j];
             float cb = Cb[i][j] - 128;
             float cr = Cr[i][j] - 128;
-            uint8_t r = y -0.0009267 * (cb)+1.4016868*(cr);
-            uint8_t g = y -0.3436954 * (cb)-0.7141690*(cr);
-            uint8_t  b = y +1.7721604 * (cb)+0.0009902*(cr);
+            float r = y -0.0009267 * (cb)+1.4016868*(cr);
+            float g = y -0.3436954 * (cb)-0.7141690*(cr);
+            float  b = y +1.7721604 * (cb)+0.0009902*(cr);
             uint8_t R= r<0?0 :(r>255?255:r);
             uint8_t G= g<0?0 :(g>255?255:g);
             uint8_t B= b<0?0 :(b>255?255:b);

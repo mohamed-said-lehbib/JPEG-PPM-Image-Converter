@@ -425,7 +425,7 @@ int main(int argc, char **argv)
 
     
     uint16_t nb[3] ={ nb_y,nb_cb,nb_cr} ;// nombre de composant par mcu
-    printf(" hello %d , %d , %d ", nb[0],nb_cb,nb_cr);
+    printf(" hello %d , %d , %d ,% d, %d", nb[0],nb_cb,nb_cr, nb_mcux, nb_mcuy);
     printf(" %d\n", nb_mcux*nb_mcuy);
     printf( " \nhi\n");
 
@@ -469,9 +469,9 @@ int main(int argc, char **argv)
         for (uint32_t j = 0; j < nb_mcux; j++){
             idct[i][j] = malloc(N_comp *sizeof(umatrice));
             for (int k = 0; k < N_comp; k++){
-                idct[i][j][k].data=malloc(8*sizeof(uint8_t*));
-                for (uint32_t l = 0; l < 8; l++){
-                    idct[i][j][k].data[l]=malloc(8*sizeof(uint8_t));
+                idct[i][j][k].data=malloc(infos_img[k]->v_i*8*sizeof(uint8_t*));
+                for (uint32_t l = 0; l < infos_img[k]->v_i*8; l++){
+                    idct[i][j][k].data[l]=malloc(infos_img[k]->h_i*8*sizeof(uint8_t));
                 }
             }
         }
@@ -505,18 +505,18 @@ int main(int argc, char **argv)
     // for( int i =0 ; i<8*vy ; i++){
     //     for (int j =0 ; j<8*hy ;j++){
 
-    //    printf(" %x ", idct[0][0][1].data[i][j]);}
+    //    printf(" %x ", idct[0][0][0].data[i][j]);}
     //    printf( "\n");
     // }
     // printf("done hh \n");
 
 
-    for( int i =0 ; i<8 ; i++){
-        for (int j =0 ; j<8 ;j++){
+    // for( int i =0 ; i<8 ; i++){
+    //     for (int j =0 ; j<8 ;j++){
 
-       printf(" %x ", idct[0][1][1].data[i][j]);}
-       printf( "\n");
-     }
+    //    printf(" %x ", idct[0][1][1].data[i][j]);}
+    //    printf( "\n");
+    //  }
 
 
 
@@ -531,7 +531,13 @@ int main(int argc, char **argv)
         }
     }
  
-    
+    // for( int i =0 ; i<8*vy ; i++){
+    //     for (int j =0 ; j<8*hy ;j++){
+
+    //    printf(" %x ", idct[2][0][1].data[i][j]);}
+    //    printf( "\n");
+    // }
+    // printf("done hh \n");
     // for( int i =0 ; i<8 ; i++){
     //     for (int j =0 ; j<8 ;j++){
 
@@ -614,6 +620,8 @@ int main(int argc, char **argv)
         free(sos_table[k]);
     }
     free(sos_table);
+    
+    
     // for (uint32_t i = 0; i < nb_mcuy; i++) {
     //     for (uint32_t j = 0; j < nb_mcux; j++) {
     //         for (int k = 0; k < N_comp; k++) {
@@ -627,6 +635,10 @@ int main(int argc, char **argv)
     //     free(idct[i]);
     // }
     // free(idct);
-   
-     return 0;
+
+    for(uint32_t i =0;i<hauteur;i++){
+        free(image[i]);
+    }
+    free(image);
+    return 0;
 }
