@@ -27,7 +27,7 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
 
     //--------------Allocation de l'espace ---------------//
 
-    umatrice new_cb_block ;
+    umatrice new_cb_block ;     
     new_cb_block.data= malloc(vcb*sizeof(uint8_t*));
     umatrice new_cr_block ;
     new_cr_block.data= malloc(vcr*sizeof(uint8_t*));

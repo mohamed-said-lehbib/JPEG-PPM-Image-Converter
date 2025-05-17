@@ -434,7 +434,7 @@ int main(int argc, char **argv)
     MCU *blocs = decode_bloc(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
 
     // for( int i =0 ; i<8 ; i++){
-    //     for (int j =0 ; j<8 ;j++){
+    //     for (int j =0 ; j<32 ;j++){
     //         printf(" %x ", blocs[1].comps[1].blocs[0].data[i*8+j]);}
     //     printf( "\n");
     // }
@@ -510,13 +510,12 @@ int main(int argc, char **argv)
     // printf("done hh \n");
 
 
-    // for( int i =0 ; i<8 ; i++){
-    //     for (int j =0 ; j<8 ;j++){
+    // for( int i =0 ; i<8*vy ; i++){
+    //     for (int j =0 ; j<8*hy ;j++){
 
-    //    printf(" %x ", idct[0][1][1].data[i][j]);}
+    //    printf(" %x ", idct[0][0][1].data[i][j]);}
     //    printf( "\n");
     //  }
-
 
 
     
@@ -531,11 +530,11 @@ int main(int argc, char **argv)
     }
  
     // for( int i =0 ; i<8*vy ; i++){
-    //     for (int j =0 ; j<8*hy ;j++){
+    //     for (int j =0 ; j<8*hy+16 ;j++){
 
-    //    printf(" %x ", idct[2][0][1].data[i][j]);}
+    //    printf(" %x ", idct[0][0][1].data[i][j]);}
     //    printf( "\n");
-    // }
+    //  }
     // printf("done hh \n");
     // for( int i =0 ; i<8 ; i++){
     //     for (int j =0 ; j<8 ;j++){
@@ -555,16 +554,16 @@ int main(int argc, char **argv)
    if (N_comp == 1){
     for (uint32_t i = 0; i < nb_mcuy; i++){
         for (uint32_t j = 0; j < nb_mcux; j++){
-            uint32_t*** new = idct[i][j];
+            umatrice* new = idct[i][j];
             for (uint32_t k = 0; k < vy*8; k++){
                 for (uint32_t l = 0; l < hy*8; l++){
                     if (i*vy*8+k < hauteur && j*hy*8+l < largeur) {
-                    image[i*vy*8+k][j*hy*8+l]=new[0][k][l];}
+                    image[i*vy*8+k][j*hy*8+l]=new[0].data[k][l];}
                 }
             }
         }
     }
-    transf_pgm(image, "bisou.pgm",largeur,hauteur);
+   transf_pgm(image, "bisou.pgm",largeur,hauteur);
    }
     else{
         for (uint32_t i = 0; i < nb_mcuy; i++){
@@ -578,6 +577,7 @@ int main(int argc, char **argv)
                 }
             }
         }
+        transf_ppm(image, "yaaaay.ppm",largeur,hauteur);
     }
     // for( int i =0 ; i<hauteur ; i++){
     //     for (int j =0 ; j<largeur ;j++){
@@ -585,7 +585,7 @@ int main(int argc, char **argv)
     //    printf(" %x ", image[i][j]);}
     //    printf( "\n");
     //     }
-    transf_ppm(image, "yaaaay.ppm",largeur,hauteur);
+    
 
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);
@@ -646,9 +646,9 @@ int main(int argc, char **argv)
     // }
     // free(idct);
 
-    for(uint32_t i =0;i<hauteur;i++){
-        free(image[i]);
-    }
-    free(image);
-    return 0;
+    // for(uint32_t i =0;i<hauteur;i++){
+    //     free(image[i]);
+    // }
+    // free(image);
+    // return 0;
 }
