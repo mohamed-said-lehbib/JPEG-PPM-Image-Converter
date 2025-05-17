@@ -522,12 +522,6 @@ int main(int argc, char **argv)
 
 // //    //------------------------------------Echantillonnage---------------------------------------------------------
 
-    printf("avants \n");
-    for (uint32_t i = 0; i < nb_mcuy; i++){
-        for (uint32_t j = 0; j < nb_mcux; j++){
-            idct[i][j]=sur_ech(idct[i][j],infos_img);
-        }
-    }
  
     // for( int i =0 ; i<8*vy ; i++){
     //     for (int j =0 ; j<8*hy+16 ;j++){
@@ -546,26 +540,23 @@ int main(int argc, char **argv)
     
 // //     // //------------------------------------Ecriture dans le fichier PPM -------------------------------------------
 
-    uint32_t** image ;
+   if (N_comp == 1){
+    
+    
+   transf_pgm(idct, "bisou.pgm",largeur,hauteur);
+   }
+    else{
+        for (uint32_t i = 0; i < nb_mcuy; i++){
+        for (uint32_t j = 0; j < nb_mcux; j++){
+            idct[i][j]=sur_ech(idct[i][j],infos_img);
+        }
+    }
+     uint32_t** image ;
+    printf("\n not yt\n");
     image= malloc(hauteur*sizeof(uint32_t*));
     for(uint32_t i =0;i<hauteur;i++){
         image[i]=malloc(largeur*sizeof(uint32_t));
     }
-   if (N_comp == 1){
-    for (uint32_t i = 0; i < nb_mcuy; i++){
-        for (uint32_t j = 0; j < nb_mcux; j++){
-            umatrice* new = idct[i][j];
-            for (uint32_t k = 0; k < vy*8; k++){
-                for (uint32_t l = 0; l < hy*8; l++){
-                    if (i*vy*8+k < hauteur && j*hy*8+l < largeur) {
-                    image[i*vy*8+k][j*hy*8+l]=new[0].data[k][l];}
-                }
-            }
-        }
-    }
-   transf_pgm(image, "bisou.pgm",largeur,hauteur);
-   }
-    else{
         for (uint32_t i = 0; i < nb_mcuy; i++){
             for (uint32_t j = 0; j < nb_mcux; j++){
                 uint32_t** new = YCbCr2RGB(idct[i][j],hy,vy);

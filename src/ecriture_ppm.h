@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 void transf_ppm (uint32_t** t, const char* nom, uint16_t largeur, uint16_t hauteur);
-void transf_pgm (uint32_t** t, const char* nom,uint16_t largeur,uint16_t hauteur);
+void transf_pgm (umatrice*** t, const char* nom,uint16_t largeur,uint16_t hauteur);
 void transf_pgm_col(uint8_t ***t, const char* nom,uint16_t largeur,uint16_t hauteur);
 #endif 
