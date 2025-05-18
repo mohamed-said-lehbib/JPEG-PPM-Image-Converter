@@ -64,9 +64,9 @@ int main(int argc, char **argv)
     // structure pour souvegarder les donnÃ©es de section SOF
     infos_comp **infos_img = NULL;
     // souvegarde du nombre des composantes de SOF
-    int N_comp = 0;
+    uint8_t N_comp = 0;
     // souvegarde du nombre des copmposantes de SOS
-    int N_comp_sos = 0;
+    uint8_t N_comp_sos = 0;
     // initialiser la section SOS
     SOS_val **sos_table = NULL;
     // souvegarder globalement la hauteur

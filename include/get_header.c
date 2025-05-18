@@ -165,7 +165,7 @@ void get_huff(FILE *fptr, huff_tbl ***huff_dc_ptr,
 
 void get_sof(FILE* fptr,infos_comp ***infos_img_ptr,
     uint16_t* ptr_hauteur,uint16_t* ptr_largeur,
-    int* N_comp_ptr){
+    uint8_t* N_comp_ptr){
     // SOF0
             // longuer
             // uint16_t len_sofb = 
@@ -212,7 +212,7 @@ void get_sof(FILE* fptr,infos_comp ***infos_img_ptr,
 
 void get_sos(FILE* fptr,SOS_val ***sos_table_ptr,
     size_t* cap_ptr,uint8_t **brutes_ptr,
-    uint16_t* ptr_N_brute,int* N_comp_sos_ptr){
+    uint16_t* ptr_N_brute,uint8_t* N_comp_sos_ptr){
             printf("in da sos\n");
         // SOS
             // longeur de section non brute
