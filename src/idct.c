@@ -131,8 +131,7 @@ uint8_t **iDCT_rap(int16_t **matrice){
     }
 
      for (int j=0;j<8;j++){
-        //Étape 4 à 3 
-       printf("\n");
+     
         for (int i=0;i<8; i++){
            
             res[j][i] = inter[i][j];

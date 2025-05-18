@@ -6,7 +6,7 @@
 
 
 // creation d'un noeud
-Huff_arb *create_node() {
+Huff_arb *creer_noeud() {
     Huff_arb* noeud = malloc(sizeof(Huff_arb)); 
     noeud->est_mot_de_code = 0;// valant 1 s'il s'agit d'un mot de code 
     noeud->symbole = 0;// le symbole stocke dans le feuille et code par un mot de code qui est represente par le chemin de la racine vers la feuille
@@ -17,7 +17,7 @@ Huff_arb *create_node() {
 // decode_bloc : elle prend en parametre l'arbre de decodage dc et ac, le flux de bits et la taille du bloc
 // elle parcourt le flux de bits et decode les coefficients DC et AC , des qu'elle remplis un un vecteur de 64 coefficients, elle l'ajoute dans le tableau de blocs
 // et elle passe au vecteur suivant
- MCU *decode_bloc(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy, uint8_t N_comp,
+ MCU *decode_huff_image(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy, uint8_t N_comp,
     uint8_t *huff_corr_dc,uint8_t *huff_corr_ac , uint16_t nb[]) {
     MCU *mcus = malloc(nb_mcux*nb_mcuy* sizeof(MCU));//allocation de la memoire pour le tableau de blocs
     
@@ -64,15 +64,15 @@ Huff_arb *create_node() {
 // insert_code : elle prend en parametre l'arbre de decodage, le code, le symbole et la longueur du code
 // elle insere le code dans l'arbre de decodage en suivant le chemin de la racine vers la feuille
 // elle cree un noeud pour chaque bit du code et elle stocke le symbole dans la feuille
-void insert_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur) {
+void inserer_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur) {
     Huff_arb *courrent = arbre; 
     for (int i = longueur - 1; i >= 0; i--) {
         uint8_t bit = (code >> i) & 1;// lecture de code bit par bit
         if (bit == 0) {
-            if (!courrent->fg) courrent->fg = create_node();
+            if (!courrent->fg) courrent->fg = creer_noeud();
             courrent = courrent->fg;
         } else {
-            if (!courrent->fd) courrent->fd = create_node();
+            if (!courrent->fd) courrent->fd = creer_noeud();
             courrent = courrent->fd;
         }
     }

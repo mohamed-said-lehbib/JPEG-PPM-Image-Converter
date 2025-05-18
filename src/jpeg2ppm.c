@@ -364,7 +364,7 @@ int main(int argc, char **argv)
     // remplir les arbres db
     for (int i = 0; i < dc; i++)
     {
-        Huff_arb *arbre_dc = create_node();
+        Huff_arb *arbre_dc = creer_noeud();
 
         uint8_t *table_dc = huff_dc[i]->lengths;
 
@@ -376,7 +376,7 @@ int main(int argc, char **argv)
             int len = i + 1;
             for (int j = 0; j < table_dc[i]; j++)
             {
-                insert_code(arbre_dc, code, symbols_dc[k], len);
+                inserer_code (arbre_dc, code, symbols_dc[k], len);
                 code++;
                 k++;
             }
@@ -387,7 +387,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < ac; i++)
     {
-        Huff_arb *arbre_ac = create_node();
+        Huff_arb *arbre_ac = creer_noeud();
 
         uint8_t *table_ac = huff_ac[i]->lengths;
 
@@ -399,7 +399,7 @@ int main(int argc, char **argv)
             int len = i + 1;
             for (int j = 0; j < table_ac[i]; j++)
             {
-                insert_code(arbre_ac, code, symbols_ac[k], len);
+                inserer_code (arbre_ac, code, symbols_ac[k], len);
                 code++;
                 k++;
             }
@@ -431,7 +431,7 @@ int main(int argc, char **argv)
 
     BitStream bs;
     create_bitstream(&bs, brutes, N_brute);
-    MCU *blocs = decode_bloc(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
+    MCU *blocs = decode_huff_image(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
 
     // for( int i =0 ; i<8 ; i++){
     //     for (int j =0 ; j<32 ;j++){
@@ -486,7 +486,7 @@ int main(int argc, char **argv)
             uint16_t decaley =0 ;
             for( int k=0 ; k<nb[j] ; k++){
                 umatrice idc;
-                idc.data =iDCT(zigzag_inv(blocs[i].comps[j].blocs[k].data));
+                idc.data =iDCT_rap(zigzag_inv(blocs[i].comps[j].blocs[k].data));
                 if (k != 0 && k % infos_img[j]->h_i == 0) {
                     decalex = 0;
                     decaley += 8;

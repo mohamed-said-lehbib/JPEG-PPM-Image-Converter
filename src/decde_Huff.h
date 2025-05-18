@@ -26,11 +26,11 @@ typedef struct {
     uint8_t nb_comp;
 } MCU ; 
 
-Huff_arb *create_node();
-void insert_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur);
+Huff_arb *creer_noeud();
+void inserer_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur);
 int decode_dc(Huff_arb *arbre, int dc_init, BitStream *bs);
 void free_arbre(Huff_arb *arbre);
 void afficher_arbre(Huff_arb *arbre);
-MCU *decode_bloc(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy,uint8_t N_comp,uint8_t *huff_corr_dc,uint8_t *huff_corr_ac, uint16_t nb[] );
+MCU *decode_huff_image(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy,uint8_t N_comp,uint8_t *huff_corr_dc,uint8_t *huff_corr_ac, uint16_t nb[] );
 int* decode_all_ac(Huff_arb *arbre, BitStream *bs);
 #endif

@@ -193,9 +193,17 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
     //--------Cas de sous echantollage horizontalle et verticale-------------//
     else{
         umatrice* new_com = sur_ech_horiz(com, infos_img);
-        infos_img[1]->h_i=hy;
-        infos_img[2]->h_i=hy;
-        return sur_ech_ver(new_com,infos_img);
+        infos_comp *temp[3];
+        for (int i = 0; i < 3; i++) {
+            temp[i] = malloc(sizeof(infos_comp));
+            *temp[i] = *infos_img[i];  
+        }
+
+        temp[1]->h_i=hy;
+        temp[2]->h_i=hy;
+        umatrice *res=sur_ech_ver(new_com,temp);
+        return res;
+    
     }
 
 }
