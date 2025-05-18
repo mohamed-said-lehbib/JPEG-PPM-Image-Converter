@@ -263,7 +263,7 @@ void get_sos(FILE* fptr,SOS_val ***sos_table_ptr,
                 // valeur de pointeur s'incrémente Ã  chaque fois
 
                 if (pointer_vr >= *cap_ptr)
-                {
+                {   
                     // si la taille ne semble pas suffisante,on double la taille
                     *cap_ptr <<= 1;
                     (*brutes_ptr) = realloc(*brutes_ptr, *cap_ptr);
