@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+
+
 #define M_PI 3.14159265358979323846
 #define cos6 cos(6*M_PI/16)
 #define sin6 sin(6*M_PI/16)
@@ -155,49 +157,4 @@ uint8_t **iDCT_rap(int16_t **matrice){
     }
     return out;
 }
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 
-
-
-// int main() {
-//     // Allocate 8x8 matrix
-//     int16_t **input = malloc(8 * sizeof(int16_t *));
-//     for (int i = 0; i < 8; i++) {
-//         input[i] = calloc(8, sizeof(int16_t)); // zero-init all elements
-//     }
-
-//     // Set a few coefficients
-//     input[0][0] = 100; // DC
-//     input[0][1] = 0;  // One AC component for testing
-
-//     printf("Input DCT matrix (only a few non-zero):\n");
-//     for (int i = 0; i < 8; i++) {
-//         for (int j = 0; j < 8; j++) {
-//             printf("%4d ", input[i][j]);
-//         }
-//         printf("\n");
-//     }
-
-//     // Apply IDCT
-//     uint8_t **result = iDCT_rap(input);
-
-//     printf("\nOutput pixel matrix (after IDCT):\n");
-//     for (int i = 0; i < 8; i++) {
-//         for (int j = 0; j < 8; j++) {
-//             printf("%02x ", result[i][j]);
-//         }
-//         printf("\n");
-//     }
-
-//     // Free input and result
-//     for (int i = 0; i < 8; i++) {
-//         free(input[i]);
-//         free(result[i]);
-//     }
-//     free(input);
-//     free(result);
-
-//     return 0;
-// }
