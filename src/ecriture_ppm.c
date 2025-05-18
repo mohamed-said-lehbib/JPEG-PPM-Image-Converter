@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include "structs.h"
+#include "../include/structs.h"
 
 
 void transf_ppm(uint32_t** t,const char* nom, uint16_t largeur, uint16_t hauteur){

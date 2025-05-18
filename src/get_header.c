@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "../src/structs.h"
+#include "../include/structs.h"
 
 void get_app0(FILE *fptr){
             // APP0

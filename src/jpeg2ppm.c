@@ -1,15 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "izigzag.h"
-#include "idct.h"
-#include "decde_Huff.h"
-#include "structs.h"
+#include "../include/izigzag.h"
+#include "../include/idct.h"
+#include "../include/decde_Huff.h"
+#include "../include/structs.h"
 #include <string.h>
-#include "quant_inverse.h"
-#include "YCbCr2RGB.h"
-#include "ecriture_ppm.h"
-#include "sur_ech_tot.h"
+#include "../include/quant_inverse.h"
+#include "../include/YCbCr2RGB.h"
+#include "../include/ecriture_ppm.h"
+#include "../include/sur_ech_tot.h"
 #include "../include/get_header.h"
 
 

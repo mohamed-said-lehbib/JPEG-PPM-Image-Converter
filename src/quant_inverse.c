@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "structs.h"
-#include "decde_Huff.h"
+#include "../include/structs.h"
+#include "../include/decde_Huff.h"
 
 void quant_inverse(Bloc *bloc, quantification_table *qt) {
     uint8_t *quant_table = (uint8_t *)qt->data;

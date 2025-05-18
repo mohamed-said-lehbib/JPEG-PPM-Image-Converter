@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include "structs.h"
+#include "../include/structs.h"
 
 extern uint16_t hauteur;
 extern uint16_t largeur;

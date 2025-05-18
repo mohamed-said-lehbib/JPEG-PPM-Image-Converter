@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "structs.h"
+#include "../include/structs.h"
 uint32_t** YCbCr2RGB(umatrice *bloc,uint8_t h,uint8_t v){
     uint8_t **Y = bloc[0].data;
     uint8_t **Cb = bloc[1].data;
