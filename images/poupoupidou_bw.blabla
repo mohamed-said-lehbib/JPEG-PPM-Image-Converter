@@ -1,0 +1,47 @@
+**************************************************************
+*** mcu 0
+** component Y
+* bloc 0
+[ DC/AC] 07(1) / 07(6) 03(2) 05(4) 04(3) 06(5) 01(2) 05(4) 04(3) 03(2) 03(2) 05(4) 04(3) 04(3) 03(2) 03(2) 01(2) 05(4) 04(3) 03(2) 01(2) 02(3) 03(2) 03(2) 04(3) 03(2) 02(3) 13(6) 03(2) 03(2) 03(2) 13(6) 12(5) 02(3) 02(3) 02(3) 12(5) 03(2) 01(2) 03(2) 01(2) 11(5) 01(2) 12(5) 33(8) 21(5) 01(2) 01(2) 01(2) 01(2) 11(5) 01(2) -- total 306 bits
+[  bloc] 47 ff90 4 ffe9 b ffdb ffff ffe4 fff8 7 4 ffeb 9 fff1 fffb 5 ffff 1a fff8 fffa ffff fffd fffb 6 8 7 3 0 fffc 4 fff9 6 0 5 0 2 3 3 fffd 0 fffe fff9 1 fffc 1 0 ffff ffff 0 fffd 0 0 0 5 0 0 1 ffff ffff ffff 1 0 ffff 1 
+[iquant] d5 ff20 8 ffd2 16 ffb6 fffd ffc8 fff0 e c ffc1 1b ffd3 ffec 1e fffc 68 ffe0 ffe8 fffc ffe8 ffe2 24 28 2a 1b 0 ffd8 28 ffc1 30 0 2d 0 18 2d 24 ffe2 0 ffe4 ffb3 9 ffdc d 0 fff3 fff2 0 ffd0 0 0 0 32 0 0 13 ffee fff0 ffed f 0 fff0 10 
+[   izz] d5 ff20 ffb6 fffd ffec 1e 0 ffd8 8 16 ffc8 ffd3 fffc 1b 28 9 ffd2 fff0 1b 68 2a ffc1 ffb3 ffdc e ffc1 ffe0 28 30 ffe4 d 32 c ffe8 24 0 0 0 0 0 fffc ffe2 2d ffe2 fff3 0 0 f ffe8 0 24 fff2 0 13 ffed 0 18 2d 0 ffd0 ffee fff0 fff0 10 
+[  idct] 61 66 5d 94 c6 b9 bc c4 63 6a 83 c9 bd db 94 83 60 96 d1 c6 60 91 b4 9e 61 5b c3 b0 6d c6 ce cc 67 73 d5 bd b5 be bd bd 66 47 6f 9b ba c4 c5 ba 64 8f 69 8c b9 bb be be 7e a6 1d 8a 8c bb c0 a8 
+* component mcu
+[   mcu] 61 66 5d 94 c6 b9 bc c4 63 6a 83 c9 bd db 94 83 60 96 d1 c6 60 91 b4 9e 61 5b c3 b0 6d c6 ce cc 67 73 d5 bd b5 be bd bd 66 47 6f 9b ba c4 c5 ba 64 8f 69 8c b9 bb be be 7e a6 1d 8a 8c bb c0 a8 
+
+**************************************************************
+*** mcu 1
+** component Y
+* bloc 0
+[ DC/AC] 00(2) / 07(6) 04(3) 07(6) 05(4) 05(4) 04(3) 05(4) 03(2) 05(4) 03(2) 03(2) 06(5) 02(3) 14(7) 03(2) 03(2) 04(3) 04(3) 04(3) 02(3) 01(2) 01(2) 01(2) 13(6) 03(2) 01(2) 02(3) 03(2) 01(2) 03(2) 03(2) 12(5) 12(5) 01(2) 11(5) 02(3) 01(2) 21(5) 01(2) 31(7) 01(2) 21(5) 11(5) 21(5) 21(5) 01(2) -- total 283 bits
+[  bloc] 47 72 fff5 ffba 18 ffe8 f 18 fffa ffef fffb 6 24 fffe 0 fff5 fffc fffc a fff1 9 fffd ffff ffff 1 0 5 5 1 fffe fffc ffff 4 fffc 0 2 0 fffe 1 0 ffff fffd ffff 0 0 1 1 0 0 0 1 1 0 0 ffff 0 ffff 0 0 ffff 0 0 ffff ffff 
+[iquant] d5 e4 ffea ff74 30 ffd0 2d 30 fff4 ffde fff1 12 6c fffa 0 ffbe fff0 fff0 28 ffc4 24 ffe8 fffa fffa 5 0 2d 28 a ffec ffdc fff8 24 ffdc 0 18 0 ffe8 a 0 fff2 ffdf fff7 0 0 11 d 0 0 0 10 11 0 0 fff4 0 ffed 0 0 ffed 0 0 fff0 fff0 
+[   izz] d5 e4 ffd0 2d 0 ffbe 28 a ffea 30 30 fffa fff0 2d ffec fff7 ff74 fff4 6c fff0 0 ffdc ffdf 0 ffde 12 28 5 fff8 fff2 0 0 fff1 ffc4 fffa 24 0 11 0 fff4 24 fffa ffdc a d 11 0 0 ffe8 0 ffe8 0 10 ffed ffed 0 18 0 0 0 0 0 fff0 fff0 
+[  idct] be ba 73 61 65 64 65 64 d4 cf b7 6f 68 68 5f 6b c7 cf cd ce c1 97 6b 60 ca 9d d9 d6 d6 d3 86 62 c7 bd c3 b5 bd c8 7b 71 b8 c3 c2 91 bf 90 47 67 bf c4 be 99 b6 9c 62 80 8c a1 7f 6b a7 8b 5a 84 
+* component mcu
+[   mcu] be ba 73 61 65 64 65 64 d4 cf b7 6f 68 68 5f 6b c7 cf cd ce c1 97 6b 60 ca 9d d9 d6 d6 d3 86 62 c7 bd c3 b5 bd c8 7b 71 b8 c3 c2 91 bf 90 47 67 bf c4 be 99 b6 9c 62 80 8c a1 7f 6b a7 8b 5a 84 
+
+**************************************************************
+*** mcu 2
+** component Y
+* bloc 0
+[ DC/AC] 07(1) / 07(6) 06(5) 04(3) 05(4) 03(2) 04(3) 04(3) 04(3) 06(5) 06(5) 03(2) 05(4) 02(3) 03(2) 03(2) 02(3) 03(2) 04(3) 04(3) 03(2) 03(2) 04(3) 01(2) 03(2) 04(3) 02(3) 01(2) 02(3) 13(6) 01(2) 02(3) 03(2) 03(2) 31(7) 02(3) 02(3) 01(2) 01(2) 02(3) 01(2) 01(2) 02(3) 01(2) 21(5) 11(5) 02(3) 01(2) 01(2) 11(5) 01(2) 21(5) 01(2) 00(7) -- total 312 bits
+[  bloc] fff5 ffb6 36 fff5 ffe4 fffb 8 fff2 fff8 ffd0 ffe0 6 10 2 4 fffc fffe 6 c e 6 fffa fff6 1 5 fff2 3 ffff 2 0 6 1 2 4 4 0 0 0 1 fffe fffe 1 ffff fffe ffff 1 fffe ffff 0 0 1 0 ffff 2 ffff 1 0 ffff 1 0 0 1 1 0 
+[iquant] ffdf ff6c 6c ffea ffc8 fff6 18 ffe4 fff0 ffa0 ffa0 12 30 6 10 ffe8 fff8 18 30 38 18 ffd0 ffc4 6 19 ffac 1b fff8 14 0 36 8 12 24 28 0 0 0 a ffea ffe4 b fff7 ffee fff3 11 ffe6 fff2 0 0 10 0 fff0 14 fff4 12 0 ffee 10 0 0 10 10 0 
+[   izz] ffdf ff6c fff6 18 10 ffe8 fff8 14 6c ffc8 ffe4 6 fff8 1b 0 fff7 ffea fff0 30 18 ffac 36 b ffee ffa0 12 30 19 8 ffe4 fff3 14 ffa0 38 6 12 ffea 11 fff0 fff4 18 ffc4 24 a ffe6 0 12 0 ffd0 28 0 fff2 10 0 0 10 0 0 0 0 ffee 10 10 0 
+[  idct] 66 5b 55 47 56 9c b6 7a 68 72 80 a8 b4 bd c1 b6 67 63 9d af bc af ab c2 5e 6c 66 8c b2 94 8e ab 64 67 55 6c 97 55 51 68 67 63 4d 4c 9e 47 54 90 60 61 65 4b 7a ab ac b7 63 68 66 60 4d 6c 76 4f 
+* component mcu
+[   mcu] 66 5b 55 47 56 9c b6 7a 68 72 80 a8 b4 bd c1 b6 67 63 9d af bc af ab c2 5e 6c 66 8c b2 94 8e ab 64 67 55 6c 97 55 51 68 67 63 4d 4c 9e 47 54 90 60 61 65 4b 7a ab ac b7 63 68 66 60 4d 6c 76 4f 
+
+**************************************************************
+*** mcu 3
+** component Y
+* bloc 0
+[ DC/AC] 07(1) / 04(3) 06(5) 04(3) 06(5) 06(5) 05(4) 04(3) 06(5) 04(3) 04(3) 04(3) 06(5) 04(3) 04(3) 04(3) 02(3) 04(3) 04(3) 03(2) 04(3) 03(2) 03(2) 02(3) 04(3) 02(3) 03(2) 04(3) 02(3) 02(3) 03(2) 03(2) 01(2) 02(3) 03(2) 02(3) 02(3) 02(3) 01(2) 02(3) 02(3) 03(2) 02(3) 01(2) 03(2) 01(2) 03(2) 02(3) 01(2) 02(3) 02(3) 11(5) 03(2) 02(3) 12(5) 01(2) 12(5) 01(2) 01(2) 01(2) 00(7) -- total 359 bits
+[  bloc] ffa2 8 33 9 21 3f 1e fff1 ffd4 f fff1 d ffd1 fff2 9 fff7 fffd fff5 e fffb fff5 fffb fffa fffd c 2 fffa fff8 2 fffd 5 4 ffff fffe fffb fffd fffd fffd 1 3 3 5 3 1 4 1 4 fffe ffff fffe fffe 0 1 fffb fffe 0 fffe ffff 0 fffd 1 ffff ffff 0 
+[iquant] fee6 10 66 12 42 7e 5a ffe2 ffa8 1e ffd3 27 ff73 ffd6 24 ffca fff4 ffd4 38 ffec ffd4 ffd8 ffdc ffee 3c c ffca ffc0 14 ffe2 2d 20 fff7 ffee ffce ffdc ffd3 ffdc a 21 2a 37 1b 9 34 11 34 ffe4 fff1 ffe0 ffe0 0 10 ffce ffe8 0 ffda ffee 0 ffc7 f fff0 fff0 0 
+[   izz] fee6 10 7e 5a 24 ffca ffc0 14 66 42 ffe2 ffd6 fff4 ffca ffe2 1b 12 ffa8 ff73 ffd4 c 2d 37 9 1e 27 38 3c 20 2a 34 ffce ffd3 ffec ffee fff7 21 11 10 ffe8 ffd4 ffdc ffee a 34 0 0 f ffd8 ffce ffdc ffe4 ffe0 ffda ffc7 fff0 ffdc ffd3 fff1 ffe0 ffee 0 fff0 0 
+[  idct] 61 4e 55 80 8b 6a 54 72 b7 af 94 56 89 68 70 67 19 b5 41 25 8a 23 7f 65 af 8c 1b 1f 6b 2a 4c 64 b8 91 18 1e 23 4c 5e 67 b5 8d d 25 40 69 67 60 8b 19 25 38 58 5f 65 6a e 19 34 55 60 5e 6b 5e 
+* component mcu
+[   mcu] 61 4e 55 80 8b 6a 54 72 b7 af 94 56 89 68 70 67 19 b5 41 25 8a 23 7f 65 af 8c 1b 1f 6b 2a 4c 64 b8 91 18 1e 23 4c 5e 67 b5 8d d 25 40 69 67 60 8b 19 25 38 58 5f 65 6a e 19 34 55 60 5e 6b 5e 
