@@ -17,8 +17,11 @@ double C(uint16_t eps){//calcule de la fonction C
     }
     return 1;
 }
-uint8_t *iDCT(int16_t *matrice){//nécessite une converion si 8 bits
-    uint8_t *S = malloc(64*sizeof(uint8_t));
+uint8_t **iDCT(int16_t **matrice){//nécessite une converion si 8 bits
+    uint8_t **S = malloc(8*sizeof(uint8_t *));
+    for (int i=0;i<8;i++){
+        S[i] = malloc(8*sizeof(uint8_t));
+    }
    
     
     for ( int x = 0;x<8;x++){
@@ -28,11 +31,11 @@ uint8_t *iDCT(int16_t *matrice){//nécessite une converion si 8 bits
                 double temp = C(lamb)*cos((2*x+1)*lamb*M_PI/16);
                 for(int u=0;u<8;u++){
                     Sxy += temp*
-                C(u)*cos((2*y+1)*u*M_PI/16)*matrice[8*lamb+u]/4.0f;
+                C(u)*cos((2*y+1)*u*M_PI/16)*matrice[lamb][u]/4.0f;
                 }
 
             }
-            S[8*x +y] = (uint8_t) fminf(255.0 , fmaxf(0.0,roundf(Sxy+128.0)));
+            S[x][y] = (uint8_t) fminf(255.0 , fmaxf(0.0,roundf(Sxy+128.0)));
         }
     }
     return S;
@@ -103,19 +106,22 @@ void Etape10(float *vect_in){
         vect_in[i] = vect_out[i];
     }
 }
-uint8_t *iDCT_rap(int16_t *matrice){
+uint8_t **iDCT_rap(int16_t **matrice){
     
     float inter[8][8];
     float res[8][8];
  
-    uint8_t *out = malloc(64*sizeof(uint8_t));
+    uint8_t **out = malloc(8*sizeof(uint8_t *));
+    for(int i=0;i<8;i++){
+         out[i] = malloc(8*sizeof(uint8_t));
+    }
     //IDCT sur tout les lignes
 
     for (int i=0;i<8;i++){
         //Étape 4 à 3 
        
         for (int j=0;j<8; j++){
-            inter[i][j] = (float)matrice[8*i + j];
+            inter[i][j] = (float)matrice[i][j];
         }
         Etape43(inter[i]);
         Etape32(inter[i]);
@@ -128,15 +134,15 @@ uint8_t *iDCT_rap(int16_t *matrice){
         //Étape 4 à 3 
        printf("\n");
         for (int i=0;i<8; i++){
-            printf("%f  ",inter[i][j]);
+           
             res[j][i] = inter[i][j];
         }
         Etape43(res[j]);
-        
+       
         Etape32(res[j]);
         Etape21(res[j]);
         Etape10(res[j]);
-        printf("\n");
+        
     }
     for(int i=0;i<8;i++){
         for (int j=0;j<8;j++){
@@ -144,24 +150,55 @@ uint8_t *iDCT_rap(int16_t *matrice){
             
             if (resji<0){resji = 0;}
             if (resji>255){resji = 255;}
-            out[8*i + j] = (uint8_t) fminf(255.0f , fmaxf(0.0,roundf(resji)));
+            out[i][j] = (uint8_t) fminf(255.0f , fmaxf(0.0,roundf(resji)));
 
         }
     }
     return out;
 }
-int main() {
-    int16_t input[64] = {0};
-    input[0] = 100;
-    input[1] = 50; // Only DC component
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
-    uint8_t *result = iDCT_rap(input);
 
-    for (int i = 0; i < 64; i++) {
-        printf("%02x ", result[i]);
-        if ((i + 1) % 8 == 0) printf("\n");
-    }
 
-    free(result);
-    return 0;
-}
+// int main() {
+//     // Allocate 8x8 matrix
+//     int16_t **input = malloc(8 * sizeof(int16_t *));
+//     for (int i = 0; i < 8; i++) {
+//         input[i] = calloc(8, sizeof(int16_t)); // zero-init all elements
+//     }
+
+//     // Set a few coefficients
+//     input[0][0] = 100; // DC
+//     input[0][1] = 0;  // One AC component for testing
+
+//     printf("Input DCT matrix (only a few non-zero):\n");
+//     for (int i = 0; i < 8; i++) {
+//         for (int j = 0; j < 8; j++) {
+//             printf("%4d ", input[i][j]);
+//         }
+//         printf("\n");
+//     }
+
+//     // Apply IDCT
+//     uint8_t **result = iDCT_rap(input);
+
+//     printf("\nOutput pixel matrix (after IDCT):\n");
+//     for (int i = 0; i < 8; i++) {
+//         for (int j = 0; j < 8; j++) {
+//             printf("%02x ", result[i][j]);
+//         }
+//         printf("\n");
+//     }
+
+//     // Free input and result
+//     for (int i = 0; i < 8; i++) {
+//         free(input[i]);
+//         free(result[i]);
+//     }
+//     free(input);
+//     free(result);
+
+//     return 0;
+// }
