@@ -357,8 +357,8 @@ int main(int argc, char **argv)
     // uint8_t hcr = (N_comp!=1)?infos_img[2]->h_i:0;
     // uint8_t vcr = (N_comp!=1)?infos_img[2]->v_i:0; 
 
-    uint16_t nb_mcux = (largeur + 7) / (8*hy);
-    uint16_t nb_mcuy = (hauteur + 7) / (8*vy);
+    uint16_t nb_mcux = (((largeur + 7)/8) +hy -1)/hy;
+    uint16_t nb_mcuy = (((hauteur + 7)/8) + vy -1)/vy;
     Huff_arb **arbres_dc = malloc(dc * sizeof(huff_tbl));
     Huff_arb **arbres_ac = malloc(ac * sizeof(huff_tbl));
     // remplir les arbres db
