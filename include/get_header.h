@@ -1,3 +1,7 @@
+#ifndef GET_HEADER_H
+#define GET_HEADER_H
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -20,3 +24,5 @@ void get_sof(FILE* fptr,infos_comp ***infos_img,
 void get_sos(FILE* fptr,SOS_val ***sos_table,
     size_t* cap_ptr,uint8_t **brutes,
     uint16_t* ptr_N_brute,uint8_t* N_comp_ss_ptr);
+
+#endif

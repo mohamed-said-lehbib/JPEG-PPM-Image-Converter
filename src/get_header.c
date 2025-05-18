@@ -190,7 +190,7 @@ void get_sof(FILE* fptr,infos_comp ***infos_img_ptr,
             // Nombre de composantes N
             *N_comp_ptr = fgetc(fptr);
 
-            *infos_img_ptr = malloc(*N_comp_ptr * sizeof(infos_comp));
+            *infos_img_ptr = malloc(*N_comp_ptr * sizeof(infos_comp *));
             for (int k = 0; k < *N_comp_ptr; k++)
             {
                 // allouer de la mémoire

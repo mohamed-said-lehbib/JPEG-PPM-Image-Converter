@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include "bitstream.h"
+#include "../include/bitstream.h"
 
 // Creer un bitstream
 BitStream create_bitstream(BitStream *bs,  uint8_t *data, int m) {

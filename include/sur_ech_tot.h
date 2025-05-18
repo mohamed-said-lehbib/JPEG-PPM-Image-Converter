@@ -1,3 +1,6 @@
+#ifndef SUR_ECH_TOT_H
+#define SUR_ECH_TOT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,3 +13,5 @@ extern uint16_t largeur;
 umatrice* sur_ech_horiz(umatrice*com, infos_comp **infos_img);
 umatrice* sur_ech_ver(umatrice* com, infos_comp **infos_img);
 umatrice* sur_ech(umatrice* com, infos_comp **infos_img);
+
+#endif

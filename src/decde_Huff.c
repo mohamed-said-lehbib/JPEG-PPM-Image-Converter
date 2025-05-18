@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "decde_Huff.h"
+#include "../include/decde_Huff.h"
 
 
 

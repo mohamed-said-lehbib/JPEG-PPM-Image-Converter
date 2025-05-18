@@ -44,26 +44,4 @@ typedef struct {
     uint8_t** data;
 } umatrice ;
 
-
-// typedef struct {
-//     matrice ycbcr[3];
-// } Mcu;
-
-
-// Composantes Y Cb Cr
-// typedef struct {
-//     block8** Y;  
-//     block8** Cb1;
-//     block8** Cr1;
-// } YCbCrstr;
-//typedef struct {
-//     uint8_t** mat;
-// } block8x8;
-// // MCUs
-// typedef struct {
-//     YCbCrstr* mcu;
-// } Mcu;
-
-
-
 #endif
