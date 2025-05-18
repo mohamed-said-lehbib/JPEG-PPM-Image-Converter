@@ -10,6 +10,7 @@
 #include "YCbCr2RGB.h"
 #include "ecriture_ppm.h"
 #include "sur_ech_tot.h"
+#include "../include/get_header.h"
 
 
 uint8_t *get_indices(SOS_val **sos_table) {}
@@ -80,258 +81,28 @@ int main(int argc, char **argv)
     uint16_t N_brute = 0;
     while ((byte == 0xff))
     { // while pas de donnÃ©es brutes
-
+        printf("here\n");
         unsigned char flag = fgetc(fptr);
-
+        printf("here %x\n",flag);
         if (flag == 0xe0)
-        { // APP0
-            // taille de la section
-            int o_fort = fgetc(fptr);
-            int o_faible = fgetc(fptr);
-            size_t taille_app = o_fort * 256 + o_faible;
-
-            // lecture de type
-            unsigned char l1 = fgetc(fptr);              // J
-            unsigned char l2 = fgetc(fptr);              // F
-            unsigned char l3 = fgetc(fptr);              // I
-            unsigned char l4 = fgetc(fptr);              // F
-            unsigned char l5 = fgetc(fptr);              //'\0'
-            // unsigned char typ[5] = {l1, l2, l3, l4, l5}; // JFIF
-
-            for (size_t j = 7; j < taille_app; j++)
-            {
-                fgetc(fptr); // ignorer le reste de l'APP0
-            }
+        { get_app0(fptr);
         }
         else if (flag == 0xfe)
-        {
-            // int len_com_b = 
-            fgetc(fptr); // commentaires (section commentaires ignorable)
-            // int len_com_s = 
-            fgetc(fptr);
-            // int taille_comm = 256 * len_com_b + len_com_s; // recupere la taill de commentaire
-            for (int j = 2; j < 16; j++)
-            {
-                fgetc(fptr);
-            }
+        {get_comment(fptr);
         }
-        else if (flag == 0xdb)
-        { // Define Quantification Table
-            int dqt_b = fgetc(fptr);
-            int dqt_s = fgetc(fptr);
-            int taille_dqt = 256 * dqt_b + dqt_s; // taille de section DQT
-
-            int j = 0;
-            while (j < taille_dqt - 2)
-            { // lorsqu'il y ancore des tables Ã  traiter
-                // extraire la prÃ©cision et l'indice
-                uint8_t inter = fgetc(fptr);
-                uint8_t prec = (inter & 0xF0) >> 4; // prÃ©cision
-                uint8_t indi = inter & 0x0F;        // indice
-                // ALLOUER LA MÃ‰MOIRE POUR LE TABLEAU TEMPORAIRE
-                quantification_table *quan_ptr = malloc(sizeof(quantification_table));
-
-                quan_ptr->prec = prec;
-                quan_ptr->i_q = indi;
-
-                if (prec == 0)
-                { // donc tableaux Ã  8 bits
-
-                    uint8_t *quan_table = malloc(64 * sizeof(uint8_t));
-                    // lire le tableau de quantification
-                    for (int k = 0; k < 64; k++)
-                    {
-                        // lire chaque Ã©lÃ¨ment
-                        quan_table[k] = fgetc(fptr);
-                    }
-                    quan_ptr->data = quan_table;
-                    // remplir la section data, a dÃ©finir le type de ce data
-                    j += 65;                         // ajouter 64 + 1  (nombre des Ã©lements de la table + indice i_q)
-                    tables[tab_q_traite] = quan_ptr; // stocker la table
-                    tab_q_traite++;                  // incrÃ©menter le nombre des tableaux traitÃ©es
-                }
-
-                else
-                { // donc tableau d'Ã©lÃ¨ments uint16_t
-
-                    uint16_t *quan_table = malloc(64 * sizeof(uint16_t));
-                    for (int k = 0; k < 64; k++)
-                    {
-                        uint16_t quan_fort = fgetc(fptr);
-                        uint16_t quan_faible = fgetc(fptr);
-                        uint16_t quan_val = (quan_fort << 8) + quan_faible;
-                        quan_table[k] = quan_val;
-                    }
-                    quan_ptr->data = quan_table;
-                    j += 129; // ici c'est nombre des Ã©lements*2 + 1 (octet d'indice)
-                    tables[tab_q_traite] = quan_ptr;
-                    tab_q_traite++;
-                }
-            }
+        else if (flag == 0xdb)//section DQT
+        { get_tables_q(fptr,&tables,&tab_q_traite);
         }
-        else if (flag == 0xc4)
-        { // Define Huffman table
-            uint16_t len1 = fgetc(fptr);
-            uint16_t len2 = fgetc(fptr);
-            uint16_t len_huff = (len1 << 8) + len2; // taille de section y inclus les octets de taille
-
-            int j = 0;
-            while (j < len_huff - 2)
-            { // s'il y a mÃªme une autre octet non exploitÃ© donc il y a un tableau tt entier
-                // trouver les informatons supplÃ©mentaires
-                uint16_t info = fgetc(fptr);
-                uint8_t type_huff = (info & 0x10) >> 4; // ac ou dc
-                // uint8_t index_huff = info & 0x0F;       // indice de ce tableau
-
-                if (type_huff == 0)
-                { // DC
-                    // initialization des tableaux des longuers
-                    uint8_t *table_longuer = malloc(16 * sizeof(uint8_t)); // 16 longouer et 16 c   ractÃ¨res au maximum
-                    int n_symb = 0;                                        // nombre des symboles
-                    for (int k = 0; k < 16; k++)
-                    {
-                        table_longuer[k] = fgetc(fptr);
-                        n_symb += table_longuer[k];
-                    }
-                    // initialization des tableau des symols,maintenant qu'on connait la taile
-                    uint8_t *symbols = malloc(n_symb * sizeof(uint8_t));
-                    for (int k = 0; k < n_symb; k++)
-                    {
-                        symbols[k] = fgetc(fptr);
-                    }
-                    // utiliser la structure dÃ©finis en hauut
-                    huff_tbl *coll = malloc(sizeof(huff_tbl));
-                    coll->lengths = table_longuer;
-                    coll->symboles = symbols;
-                    coll->nb_symb = n_symb;
-                    // stocker le tableux avec les types correspondants
-                    huff_dc[dc] = coll;
-                    dc++;                 // dc = indice de prochain table s'il existe
-                    j += 1 + 16 + n_symb; // avancer avec le nombre des octets lus
-                }
-                else
-                {                                                          // AC
-                    uint8_t *table_longuer = malloc(16 * sizeof(uint8_t)); // 16 longouer et 16 c   ractÃ¨res au maximum
-                    int n_symb = 0;                                        // nombre des symboles
-                    for (int k = 0; k < 16; k++)
-                    {
-                        table_longuer[k] = fgetc(fptr);
-                        n_symb += table_longuer[k];
-                    }
-
-                    uint8_t *symbols = malloc(n_symb * sizeof(uint8_t));
-                    for (int k = 0; k < n_symb; k++)
-                    {
-                        symbols[k] = fgetc(fptr);
-                    }
-
-                    huff_tbl *coll = malloc(sizeof(huff_tbl));
-
-                    coll->lengths = table_longuer;
-                    coll->symboles = symbols;
-                    coll->nb_symb = n_symb;
-                    huff_ac[ac] = coll;
-
-                    ac++; // ac = indice de prochain table s'il existe
-                    j += 1 + 16 + n_symb;
-                }
-            }
+        else if (flag == 0xc4)//section DHT
+        { 
+            get_huff(fptr,&huff_dc,&huff_ac,&dc,&ac);
         }
-        else if (flag == 0xc0)
-        { // SOF0
-            // longuer
-            // uint16_t len_sofb = 
-            fgetc(fptr); // octet de poids fort
-            // uint16_t len_sofs = 
-            fgetc(fptr); // octet de poids faible
-            // uint16_t taille_sofo = (len_sofb << 8) + len_sofs;
-
-            // prÃ©cision
-            // uint8_t prec_sof = 
-            fgetc(fptr);
-
-            // hauteur et largeur
-            uint16_t haut_h = fgetc(fptr);
-            uint16_t haut_b = fgetc(fptr);
-            hauteur = (haut_h << 8) + haut_b;
-
-            uint16_t lar_h = fgetc(fptr);
-            uint16_t lar_b = fgetc(fptr);
-            largeur = (lar_h << 8) + lar_b;
-
-            // Nombre de composantes N
-            N_comp = fgetc(fptr);
-
-            infos_img = malloc(N_comp * sizeof(infos_comp));
-            for (int k = 0; k < N_comp; k++)
-            {
-                // allouer de la mÃ©moire
-                infos_comp *case_k = malloc(sizeof(infos_comp));
-                // type de composante,Y,Cb ou Cr
-                uint8_t i_c = fgetc(fptr);
-                case_k->i_c = i_c;
-                // les facters d'Ã©chantillonage,4:2:0 ,...
-                uint8_t ech_fact = fgetc(fptr); // facteur d'Ã©chantillonage
-                case_k->h_i = (ech_fact >> 4);
-                case_k->v_i = (ech_fact & 0x0F);
-                case_k->i_q = fgetc(fptr); // indice tableau de quantification
-                // stocker dans la case correspondante
-                infos_img[k] = case_k;
-            }
+        else if (flag == 0xc0)//section SOF0
+        { 
+            get_sof(fptr,&infos_img,&hauteur,&largeur,&N_comp) ;   
         }
-        else if (flag == 0xda)
-        { // SOS
-            // longeur de section non brute
-            // uint16_t len_sos_b = 
-            fgetc(fptr);
-            // uint16_t len_sos_f = 
-            fgetc(fptr);
-            //uint16_t len_sos = (len_sos_b << 8) + len_sos_f;
-            // nombre de composante sos
-            N_comp_sos = fgetc(fptr);
-
-            sos_table = malloc(N_comp_sos * sizeof(SOS_val *));
-            for (int k = 0; k < N_comp_sos; k++)
-            {
-                // type de composante
-                uint8_t i_c = fgetc(fptr);
-                // indice ac/dc ,type et indice de table de huffman correspondant
-                uint8_t ac_dc = fgetc(fptr);
-                SOS_val *SH = malloc(sizeof(SOS_val));
-                SH->i_c = i_c;
-                SH->i_dc = (ac_dc >> 4);
-                SH->i_ac = (ac_dc & 0x0F);
-                // stocker ces valeurs
-                sos_table[k] = SH;
-            }
-            fgetc(fptr);
-            fgetc(fptr);
-            fgetc(fptr); // bits Ã  ignorer
-            // extraction des data brutes----
-            cap = 256; // initialisation de cap
-            byte = fgetc(fptr);
-            uint32_t pointer_vr = 0;
-            brutes = malloc(cap * sizeof(uint8_t));
-            uint8_t next = fgetc(fptr);
-            N_brute = 0;
-            // lire deuc bytes pour vÃ©rifier si on est dans le EOF ou pas
-            while ((next != 0xd9) | (byte != 0xff))
-            {
-
-                brutes[pointer_vr++] = byte; // le pointeur d'incrÃ©mente Ã  chaque stockage
-                byte = next;
-                next = fgetc(fptr); // avancer  toujours d'un pas
-
-                // valeur de pointeur s'incrÃ©mente Ã  chaque fois
-
-                if (pointer_vr >= cap)
-                {
-                    // si la taille ne semble pas suffisante,on double la taille
-                    cap <<= 1;
-                    brutes = realloc(brutes, cap);
-                }
-            }
-            N_brute = pointer_vr; // recupÃ©rer le nombre des donnÃ©es brutes
+        else if (flag == 0xda)//section SOS
+        { get_sos(fptr,&sos_table,&cap,&brutes,&N_brute,&N_comp_sos);
             break;
         }
         else if (flag == 0xd9)
