@@ -79,9 +79,7 @@ int main(int argc, char **argv)
     uint16_t N_brute = 0;
     while ((byte == 0xff))
     { // while pas de donnÃ©es brutes
-        printf("here\n");
         unsigned char flag = fgetc(fptr);
-        printf("here %x\n", flag);
         if (flag == 0xe0)
         {
             get_app0(fptr);
@@ -269,49 +267,34 @@ int main(int argc, char **argv)
     if (N_comp == 1)
     {
 
-        transf_pgm(idct, "bisou.pgm", largeur, hauteur);
+        transf_pgm(idct, argv[1], largeur, hauteur);
     }
     else
     {
-        for (uint32_t i = 0; i < nb_mcuy; i++)
-        {
-            for (uint32_t j = 0; j < nb_mcux; j++)
-            {
+        for (uint32_t i = 0; i < nb_mcuy; i++){
+            for (uint32_t j = 0; j < nb_mcux; j++){
                 idct[i][j] = sur_ech(idct[i][j], infos_img);
             }
         }
         uint32_t **image;
-        printf("\n not yt\n");
         image = malloc(hauteur * sizeof(uint32_t *));
-        for (uint32_t i = 0; i < hauteur; i++)
-        {
+        for (uint32_t i = 0; i < hauteur; i++){
             image[i] = malloc(largeur * sizeof(uint32_t));
         }
-        for (uint32_t i = 0; i < nb_mcuy; i++)
-        {
-            for (uint32_t j = 0; j < nb_mcux; j++)
-            {
+        for (uint32_t i = 0; i < nb_mcuy; i++){
+            for (uint32_t j = 0; j < nb_mcux; j++){
                 uint32_t **new = YCbCr2RGB(idct[i][j], hy, vy);
-                for (uint32_t k = 0; k < vy * 8; k++)
-                {
-                    for (uint32_t l = 0; l < hy * 8; l++)
-                    {
-                        if (i * vy * 8 + k < hauteur && j * hy * 8 + l < largeur)
-                        {
+                for (uint32_t k = 0; k < vy * 8; k++){
+                    for (uint32_t l = 0; l < hy * 8; l++){
+                        if (i * vy * 8 + k < hauteur && j * hy * 8 + l < largeur){
                             image[i * vy * 8 + k][j * hy * 8 + l] = new[k][l];
                         }
                     }
                 }
             }
         }
-        transf_ppm(image, "yaaaay.ppm", largeur, hauteur);
+        transf_ppm(image, argv[1], largeur, hauteur);
 
-        for (uint32_t i=0 ; i<hauteur;i++){
-            free(image[i]);
-        }
-        free(image);
-    }
-  
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);
 
@@ -372,20 +355,29 @@ int main(int argc, char **argv)
     }
     free(mcus);
 
-    // for (uint32_t i = 0; i < nb_mcuy; i++) {
-    //     for (uint32_t j = 0; j < nb_mcux; j++) {
-    //         for (int k = 0; k < N_comp; k++) {
-    //             for (uint32_t l = 0; l < infos_img[k]->v_i * 8; l++) {
-    //                 free(idct[i][j][k].data[l]);
-    //             }
-    //             free(idct[i][j][k].data);
-    //         }
-    //         free(idct[i][j]);
-    //     }
-    //     free(idct[i]);
-    // }
-    // free(idct);
-    
+    for (uint32_t i = 0; i < nb_mcuy; i++) {
+        for (uint32_t j = 0; j < nb_mcux; j++) {
+            for (int k = 0; k < N_comp; k++) {
+                for (uint32_t l = 0; l < vy * 8; l++) {
+                    free(idct[i][j][k].data[l]);
+                }
+                free(idct[i][j][k].data);
+            }
+            free(idct[i][j]);
+        }
+        free(idct[i]);
+    }
+    free(idct);
+
+    //-------------image--------------//
+    for (uint32_t i=0 ; i<hauteur;i++){
+        free(image[i]);
+    }
+    free(image);
+}
+
+
+
 
     return 0;
 }
