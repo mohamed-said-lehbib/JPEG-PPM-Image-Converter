@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     FILE *fptr = fopen(argv[1], "rb");
     if (fptr == NULL)
     { // s'assurer qu'on trouve le fichier
-        perror("ouverture pas Ã©tablie");
+        perror("ouverture pas établie");
         return 2;
     }
 
@@ -32,34 +32,34 @@ int main(int argc, char **argv)
     // tous les fichiers jpeg finissent par SOI et EOI
     unsigned char byte = fgetc(fptr); // recpuperer le premier ff
 
-    uint8_t tab_q_traite = 0; /*tableaux de quantifications traitÃ©s
-     structure pour stocker les tableaux de diffÃ©rents tailles*/
+    uint8_t tab_q_traite = 0; /*tableaux de quantifications traités
+     structure pour stocker les tableaux de différents tailles*/
 
     quantification_table **tables = malloc(4 * sizeof(quantification_table *)); // 4 tableaux au maximum
     if (tables == NULL)
     { // s'assurer que malloc marche
-        fprintf(stderr, "allocation de mÃ©moire ");
+        fprintf(stderr, "allocation de mémoire ");
         exit(EXIT_FAILURE);
     }
 
-    // initialiser les donnÃ©es de HUffmann
+    // initialiser les données de HUffmann
     huff_tbl **huff_ac = malloc(4 * sizeof(huff_tbl *));
 
     if (huff_ac == NULL)
     { // s'assurer que malloc marche
-        fprintf(stderr, "allocation de mÃ©moire ");
+        fprintf(stderr, "allocation de mémoire ");
         exit(EXIT_FAILURE);
     }
     huff_tbl **huff_dc = malloc(4 * sizeof(huff_tbl *));
     if (huff_dc == NULL)
     {
-        fprintf(stderr, "allocation de mÃ©moire ");
+        fprintf(stderr, "allocation de mémoire ");
         exit(EXIT_FAILURE);
     }
     uint8_t ac = 0; // nombre de tables ac
   
     uint8_t dc = 0; // nombre de tables dc
-    // structure pour souvegarder les donnÃ©es de section SOF
+    // structure pour souvegarder les données de section SOF
     infos_comp **infos_img = NULL;
     // souvegarde du nombre des composantes de SOF
     uint8_t N_comp = 0;
@@ -71,14 +71,14 @@ int main(int argc, char **argv)
     uint16_t hauteur = 0;
     // souvegarder globalement la largeur
     uint16_t largeur = 0;
-    // initialiser les donnÃ©es brutes
+    // initialiser les données brutes
     uint8_t *brutes = NULL;
     // on ne sait pas leur taille,donc on met une taille variable cap
     size_t cap = 0; // taille variable
-    // souvegarder en fin le nombre des donnÃ©es brutes
+    // souvegarder en fin le nombre des données brutes
     uint16_t N_brute = 0;
     while ((byte == 0xff))
-    { // while pas de donnÃ©es brutes
+    { // while pas de données brutes
         unsigned char flag = fgetc(fptr);
         if (flag == 0xe0)//récuperer le type de l'image,...
         {
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
         byte = fgetc(fptr); // avancer vers le ff
     }
 
-    // extraction des donnÃ©es brutes
+    // extraction des données brutes
     //--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
     
     uint8_t nb_y = (uint8_t)infos_img[0]->h_i * infos_img[0]->v_i;
