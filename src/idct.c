@@ -40,6 +40,10 @@ uint8_t **iDCT(int16_t **matrice){//nécessite une converion si 8 bits
             S[x][y] = (uint8_t) fminf(255.0 , fmaxf(0.0,roundf(Sxy+128.0)));
         }
     }
+    for (int i=0;i<8;i++){
+        free(matrice[i]);
+    }
+    free(matrice);
     return S;
 }
 void Etape43(float *vect_in){
@@ -145,6 +149,7 @@ uint8_t **iDCT_rap(int16_t **matrice){
         Etape10(res[j]);
         
     }
+    
     for(int i=0;i<8;i++){
         for (int j=0;j<8;j++){
             double  resji = res[j][i]*8 +128.0f;
@@ -152,9 +157,13 @@ uint8_t **iDCT_rap(int16_t **matrice){
             if (resji<0){resji = 0;}
             if (resji>255){resji = 255;}
             out[i][j] = (uint8_t) fminf(255.0f , fmaxf(0.0,roundf(resji)));
-
+            
         }
     }
+    for (int j=0;j<8;j++){
+        free(matrice[j]);
+    }
+    free(matrice);
     return out;
 }
 

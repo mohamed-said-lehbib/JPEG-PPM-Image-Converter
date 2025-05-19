@@ -50,5 +50,7 @@ int16_t **zigzag_inv(int16_t *quan_vect){
 
 
         }
+        
         return table;
+
     }

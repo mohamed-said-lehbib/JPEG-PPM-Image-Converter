@@ -255,8 +255,13 @@ int main(int argc, char **argv)
                     for (int m = 0; m < 8; m++)
                     {
                         idct[i / nb_mcux][i % nb_mcux][j].data[l + decaley][m + decalex] = idc.data[l][m];
+
                     }
+                    free(idc.data[l]);
+                
                 }
+                free(idc.data);
+                
                 decalex += 8;
             }
         }
@@ -290,7 +295,9 @@ int main(int argc, char **argv)
                             image[i * vy * 8 + k][j * hy * 8 + l] = new[k][l];
                         }
                     }
+                free (new[k]);
                 }
+                free (new);
             }
         }
         transf_ppm(image,"iiii.ppm", largeur, hauteur);
@@ -341,6 +348,15 @@ int main(int argc, char **argv)
         free(sos_table[k]);
     }
     free(sos_table);
+
+    free(brutes);
+    free(qt_corr);
+    free(huff_corr_ac);
+    free(huff_corr_dc);
+
+
+
+
 
     for (uint32_t i = 0; i < dc; i++)
     {
