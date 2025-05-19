@@ -11,12 +11,11 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
     
     //-----------recuperation des donnees------------------//
 
-    uint8_t **y = com[0].data;           //  recuperation des composantes
+          //  recuperation des composantes
     uint8_t **cb = com[1].data;
     uint8_t **cr = com[2].data;
 
-    uint8_t hy = 8*infos_img[0]->h_i; // recuperation des dimensions des composantes
-    uint8_t vy = 8*infos_img[0]->v_i;         
+    uint8_t hy = 8*infos_img[0]->h_i; // recuperation des dimensions des composantes         
     uint8_t hcb = 8*infos_img[1]->h_i;
     uint8_t vcb = 8*infos_img[1]->v_i;    
     uint8_t hcr = 8*infos_img[2]->h_i;
@@ -53,7 +52,7 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
     for (int i =0;i< vcr;i++){
         uint16_t decale=0;
         for (int j = 0 ; j<hcr; j++){
-            decale = facteur_hcb*j;                         // pour commencer là oû on est arreter l'iteration precedente
+            decale = facteur_hcr*j;                         // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
                 new_cr_block.data[i][k+decale] = cr[i][j];  // On remplit le nouveu block par les valeur dupliqué facteur_hrb fois
             }
@@ -86,12 +85,12 @@ umatrice*sur_ech_ver(umatrice*com, infos_comp **infos_img){
     
     //-----------recuperation des donnees------------------//
 
-    uint8_t **y = com[0].data;           //  recuperation des composantes
-    uint8_t **cb = com[1].data;
+                              
+    uint8_t **cb = com[1].data;       //  recuperation des composantes
     uint8_t **cr = com[2].data;
 
-    uint8_t hy = 8*infos_img[0]->h_i; // recuperation des dimensions des composantes
-    uint8_t vy = 8*infos_img[0]->v_i;         
+   
+    uint8_t vy = 8*infos_img[0]->v_i;          // recuperation des dimensions des composantes
     uint8_t hcb = 8*infos_img[1]->h_i;
     uint8_t vcb = 8*infos_img[1]->v_i;    
     uint8_t hcr = 8*infos_img[2]->h_i;
@@ -167,18 +166,17 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
 
 
     //--------Cas de sous echantollage verticale----------------//
-    if ( (vy!=vcb | vy !=vcr)&&(hy==hcb | hy ==hcr)){                   // Si les hauteurs sont differentes alors on fait 
+    if ((hy==hcb || hy ==hcr)&&(vy!=vcb || vy !=vcr)){                   // Si les hauteurs sont differentes alors on fait 
         return sur_ech_ver(com, infos_img);                             // un echantillonnage verticale
     }
 
     //--------Cas de sous echantollage horizontalle-------------//
-    else if ( (hy!=hcb | hy !=hcr)&&(vy==vcb | vy ==vcr)){              // Si les largeurs sont differentes alors on fait 
+    else if ((vy==vcb || vy ==vcr)&&(hy!=hcb || hy !=hcr)){              // Si les largeurs sont differentes alors on fait 
         return sur_ech_horiz(com, infos_img);                           // un echantillonnage horizontale
     }
 
-
     //--------Cas de sous echantollage horizontalle et verticale-------------//
-    else if ((vy!=vcb | vy !=vcr)&&( hy!=hcb | hy !=hcr)){              // si les                                          
+    else if ((vy!=vcb || vy !=vcr)&&( hy!=hcb || hy !=hcr)){              // si les                                          
         umatrice* new_com = sur_ech_horiz(com, infos_img);
         infos_comp *temp[3];
         for (int i = 0; i < 3; i++) {
@@ -191,5 +189,5 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
         return res;
     
     }
-
+    return com;
 }
