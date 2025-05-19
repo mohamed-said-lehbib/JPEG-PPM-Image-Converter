@@ -80,29 +80,33 @@ int main(int argc, char **argv)
     while ((byte == 0xff))
     { // while pas de donnÃ©es brutes
         unsigned char flag = fgetc(fptr);
-        if (flag == 0xe0)
+        if (flag == 0xe0)//récuperer le type de l'image,...
         {
             get_app0(fptr);
         }
-        else if (flag == 0xfe)
+        else if (flag == 0xfe)//commentaire (commentaire)
         {
             get_comment(fptr);
         }
-        else if (flag == 0xdb) // section DQT
+        else if (flag == 0xdb) // section DQT,là il y a les tables de quantifictions et leurs indices
         {
-            get_tables_q(fptr, &tables, &tab_q_traite);
+            get_tables_q(fptr, &tables, &tab_q_traite);//modifier la valeur qu'on veut par un pointeur
         }
-        else if (flag == 0xc4) // section DHT
+        else if (flag == 0xc4) // section DHT,là où il y a les indices,longuers et symboles correspondants au tablaux de Huffman
         {
             get_huff(fptr, &huff_dc, &huff_ac, &dc, &ac);
         }
-        else if (flag == 0xc0) // section SOF0
+        else if (flag == 0xc0) // section SOF0,on extrait ici les dimensions de l'image,et les tableaux 
+        //les tableaux de quantification correspondante à chaque composante et les facteurs d'échantillonage
         {
-            get_sof(fptr, &infos_img, &hauteur, &largeur, &N_comp);
+            get_sof(fptr, &infos_img, &hauteur, &largeur, &N_comp);//tout stocké dans info_img
         }
-        else if (flag == 0xda) // section SOS
+        else if (flag == 0xda) // section SOS,mà on extrait les correspondances entre les tableayx de Huffman
+        //et les composante,et puis on extrait les données brutes
         {
-            get_sos(fptr, &sos_table, &cap, &brutes, &N_brute, &N_comp_sos);
+            get_sos(fptr, &sos_table, &cap, &brutes, &N_brute, &N_comp_sos);//stockage dans sos_table des informations
+            //des composantes
+            //les donnees brutes sont dans brutes
             break;
         }
         else if (flag == 0xd9)
