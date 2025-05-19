@@ -44,13 +44,8 @@ void transf_pgm(umatrice*** t, const char* nom, uint16_t largeur, uint16_t haute
             if( mcu_y*8 +i >= hauteur){break;}
             for (uint16_t mcu_x = 0; mcu_x < nb_mcux; mcu_x++) {
                 for (uint8_t j = 0; j < 8; j++) {  
-                      if( mcu_x*8 +j >= largeur){break;}
-                    if (t[mcu_y][mcu_x]->data[i][j] > 255){
-                        b = 255;
-                    }
-                    else {
-                        b= t[mcu_y][mcu_x]->data[i][j];
-                    }
+                    if( mcu_x*8 +j >= largeur){break;}
+                    b= t[mcu_y][mcu_x]->data[i][j];
                     fwrite(&b, sizeof(uint8_t), 1, fichier);
                 }
             }

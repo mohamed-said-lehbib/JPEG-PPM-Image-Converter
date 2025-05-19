@@ -11,18 +11,22 @@ void get_app0(FILE *fptr){
             size_t taille_app = o_fort * 256 + o_faible;
 
             // lecture de type
-            unsigned char l1 = fgetc(fptr);              // J
-            unsigned char l2 = fgetc(fptr);              // F
-            unsigned char l3 = fgetc(fptr);              // I
-            unsigned char l4 = fgetc(fptr);              // F
-            unsigned char l5 = fgetc(fptr);              //'\0'
+            //unsigned char l1 = 
+            fgetc(fptr);              // J
+            //nsigned char l2 = 
+            fgetc(fptr);              // F
+            //unsigned char l3 =
+             fgetc(fptr);              // I
+            //unsigned char l4 =
+             fgetc(fptr);              // F
+            //unsigned char l5 =
+             fgetc(fptr);              //'\0'
             // unsigned char typ[5] = {l1, l2, l3, l4, l5}; // JFIF
 
             for (size_t j = 7; j < taille_app; j++)
             {
                 fgetc(fptr); // ignorer le reste de l'APP0
             }
-            printf("kgk\n");
 }
 
 void get_comment(FILE *fptr){//ignorer
@@ -213,7 +217,6 @@ void get_sof(FILE* fptr,infos_comp ***infos_img_ptr,
 void get_sos(FILE* fptr,SOS_val ***sos_table_ptr,
     size_t* cap_ptr,uint8_t **brutes_ptr,
     uint16_t* ptr_N_brute,uint8_t* N_comp_sos_ptr){
-            printf("in da sos\n");
         // SOS
             // longeur de section non brute
             // uint16_t len_sos_b = 
@@ -228,7 +231,6 @@ void get_sos(FILE* fptr,SOS_val ***sos_table_ptr,
             for (int k = 0; k < *N_comp_sos_ptr; k++)
             {
                 // type de composante
-                 printf("in da sos\n");
                 uint8_t i_c = fgetc(fptr);
                 // indice ac/dc ,type et indice de table de huffman correspondant
                 uint8_t ac_dc = fgetc(fptr);
@@ -237,10 +239,8 @@ void get_sos(FILE* fptr,SOS_val ***sos_table_ptr,
                 SH->i_dc = (ac_dc >> 4);
                 SH->i_ac = (ac_dc & 0x0F);
                 // stocker ces valeurs
-                printf("in da sos\n");
                 (*sos_table_ptr)[k] = SH;
             }
-            printf("in da sos\n");
             fgetc(fptr);
             fgetc(fptr);
             fgetc(fptr); // bits Ã  ignorer
@@ -251,7 +251,6 @@ void get_sos(FILE* fptr,SOS_val ***sos_table_ptr,
             *brutes_ptr = malloc(*cap_ptr * sizeof(uint8_t));
             uint8_t next = fgetc(fptr);
             *ptr_N_brute = 0;
-            printf("in da sos\n");
             // lire deuc bytes pour vérifier si on est dans le EOF ou pas
             while ((next != 0xd9) | (byte != 0xff))
             {
