@@ -22,16 +22,15 @@ void get_app0(FILE *fptr){
             {
                 fgetc(fptr); // ignorer le reste de l'APP0
             }
+            printf("kgk\n");
 }
 
 void get_comment(FILE *fptr){//ignorer
 
-            // int len_com_b = 
-            fgetc(fptr); // commentaires (section commentaires ignorable)
-            // int len_com_s = 
-            fgetc(fptr);
-            // int taille_comm = 256 * len_com_b + len_com_s; // recupere la taill de commentaire
-            for (int j = 2; j < 16; j++)
+            int len_com_b = fgetc(fptr); // commentaires (section commentaires ignorable)
+            int len_com_s = fgetc(fptr);
+            int taille_comm = 256 * len_com_b + len_com_s; // recupere la taill de commentaire
+            for (int j = 2; j < taille_comm; j++)
             {
                 fgetc(fptr);
             }
@@ -56,7 +55,7 @@ void get_tables_q(FILE *fptr,quantification_table ***tables_ptr,uint8_t *tqt_ptr
 
                 quan_ptr->prec = prec;
                 quan_ptr->i_q = indi;
-
+               
                 if (prec == 0)
                 { // donc tableaux Ã  8 bits
 
@@ -71,9 +70,10 @@ void get_tables_q(FILE *fptr,quantification_table ***tables_ptr,uint8_t *tqt_ptr
                     // remplir la section data, a définir le type de ce data
                     j += 65;                         // ajouter 64 + 1  (nombre des élements de la table + indice i_q)
                     tables[*tqt_ptr] = quan_ptr; // stocker la table
-                    (*tqt_ptr)++;                  // incrémenter le nombre des tableaux traitées
+                    (*tqt_ptr)++;  
+                                  // incrémenter le nombre des tableaux traitées
                 }
-
+                
                 else
                 { // donc tableau d'élÃ¨ments uint16_t
 
@@ -173,7 +173,7 @@ void get_sof(FILE* fptr,infos_comp ***infos_img_ptr,
             // uint16_t len_sofs = 
             fgetc(fptr); // octet de poids faible
             // uint16_t taille_sofo = (len_sofb << 8) + len_sofs;
-
+         
             // précision
             // uint8_t prec_sof = 
             fgetc(fptr);

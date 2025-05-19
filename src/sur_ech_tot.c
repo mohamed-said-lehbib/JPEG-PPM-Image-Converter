@@ -167,25 +167,24 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
 
 
     //--------Cas de sous echantollage verticale----------------//
-    if ( vy!=vcb | vy !=vcr){                                     // Si les largeur
-        return sur_ech_ver(com, infos_img);
+    if ( (vy!=vcb | vy !=vcr)&&(hy==hcb | hy ==hcr)){                                     // Si les hauteurs sont differentes alors on fait 
+        return sur_ech_ver(com, infos_img);                       // un echantillonnage verticale
     }
 
     //--------Cas de sous echantollage horizontalle-------------//
-    else if ( hy!=hcb | hy !=hcr){
-        return sur_ech_horiz(com, infos_img);
+    else if ( (hy!=hcb | hy !=hcr)&&(vy==vcb | vy ==vcr)){                                // Si les largeurs sont differentes alors on fait 
+        return sur_ech_horiz(com, infos_img);                     // un echantillonnage horizontale
     }
 
 
     //--------Cas de sous echantollage horizontalle et verticale-------------//
-    else{
+    else if ((vy!=vcb | vy !=vcr)&&( hy!=hcb | hy !=hcr)){              // si les                                          
         umatrice* new_com = sur_ech_horiz(com, infos_img);
         infos_comp *temp[3];
         for (int i = 0; i < 3; i++) {
             temp[i] = malloc(sizeof(infos_comp));
             *temp[i] = *infos_img[i];  
         }
-
         temp[1]->h_i=hy;
         temp[2]->h_i=hy;
         umatrice *res=sur_ech_ver(new_com,temp);

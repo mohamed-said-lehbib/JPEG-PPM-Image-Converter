@@ -43,7 +43,6 @@ void transf_pgm(umatrice*** t, const char* nom, uint16_t largeur, uint16_t haute
         for (uint8_t i = 0; i < 8; i++) {
             if( mcu_y*8 +i >= hauteur){break;}
             for (uint16_t mcu_x = 0; mcu_x < nb_mcux; mcu_x++) {
-                uint16_t k = mcu_y * nb_mcux + mcu_x; 
                 for (uint8_t j = 0; j < 8; j++) {  
                       if( mcu_x*8 +j >= largeur){break;}
                     if (t[mcu_y][mcu_x]->data[i][j] > 255){

@@ -57,7 +57,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     uint8_t ac = 0; // nombre de tables ac
-
+  
     uint8_t dc = 0; // nombre de tables dc
     // structure pour souvegarder les donnÃ©es de section SOF
     infos_comp **infos_img = NULL;
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
     // extraction des donnÃ©es brutes
     //--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
-
+    
     uint8_t nb_y = (uint8_t)infos_img[0]->h_i * infos_img[0]->v_i;
     uint8_t nb_cb = (uint8_t)(N_comp != 1) ? infos_img[1]->h_i * infos_img[1]->v_i : 0;
     uint8_t nb_cr = (uint8_t)(N_comp != 1) ? infos_img[2]->h_i * infos_img[2]->v_i : 0;
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
             }
         }
     }
-
+                                           
     //--------------------------------Allocation de la memoire -----------------------------------//
     umatrice ***idct = malloc(nb_mcuy * sizeof(umatrice **));
     for (uint32_t i = 0; i < nb_mcuy; i++)
@@ -267,7 +267,7 @@ int main(int argc, char **argv)
     if (N_comp == 1)
     {
 
-        transf_pgm(idct, argv[1], largeur, hauteur);
+        transf_pgm(idct, "pppp", largeur, hauteur);
     }
     else
     {
@@ -293,8 +293,12 @@ int main(int argc, char **argv)
                 }
             }
         }
-        transf_ppm(image, argv[1], largeur, hauteur);
-
+        transf_ppm(image,"iiii.ppm", largeur, hauteur);
+        for (uint32_t i=0 ; i<hauteur;i++){
+            free(image[i]);
+        }
+        free(image);
+    }
     //---------------------------FIN--------------------------------------------------------------
     fclose(fptr);
 
@@ -370,11 +374,7 @@ int main(int argc, char **argv)
     free(idct);
 
     //-------------image--------------//
-    for (uint32_t i=0 ; i<hauteur;i++){
-        free(image[i]);
-    }
-    free(image);
-}
+ 
 
 
 
