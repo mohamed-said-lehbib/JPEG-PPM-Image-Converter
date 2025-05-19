@@ -28,11 +28,11 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
     //--------------Allocation de l'espace ---------------//
 
     umatrice new_cb_block ;     
-    new_cb_block.data= malloc(vcb*sizeof(uint8_t*));
-    umatrice new_cr_block ;
+    new_cb_block.data= malloc(vcb*sizeof(uint8_t*));        // les hauteurs des composantes ne changes pas dans 
+    umatrice new_cr_block ;                                 // le sur echantillonnage horizontal 
     new_cr_block.data= malloc(vcr*sizeof(uint8_t*));
     for (uint8_t i = 0; i < vcb; i++) {
-        new_cb_block.data[i] = malloc(hy * sizeof(uint8_t));
+        new_cb_block.data[i] = malloc(hy * sizeof(uint8_t));        // Les largeurs prennent la valeur de celle Y
         new_cr_block.data[i] = malloc(hy * sizeof(uint8_t));
     }
 
@@ -43,9 +43,9 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
     for (int i =0;i< vcb;i++){
         uint16_t decale=0;
         for (int j = 0 ; j<hcb; j++){
-            decale = facteur_hcb*j;       // pour commencer là oû on est arreter l'iteration precedente
+            decale = facteur_hcb*j;                         // pour commencer là oû on est arreter dans l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
-                new_cb_block.data[i][k+decale] = cb[i][j];
+                new_cb_block.data[i][k+decale] = cb[i][j];  // On remplit le nouveu block par les valeur dupliqué facteur_hcb fois
             }
         }
     }
@@ -53,14 +53,13 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
     for (int i =0;i< vcr;i++){
         uint16_t decale=0;
         for (int j = 0 ; j<hcr; j++){
-            /*uint16_t valeur = cr[i][j];*/
-            decale = facteur_hcb*j;       // pour commencer là oû on est arreter l'iteration precedente
+            decale = facteur_hcb*j;                         // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
-                new_cr_block.data[i][k+decale] = cr[i][j];
+                new_cr_block.data[i][k+decale] = cr[i][j];  // On remplit le nouveu block par les valeur dupliqué facteur_hrb fois
             }
         }
     }
-    com[1] = new_cb_block;
+    com[1] = new_cb_block;                                  // On point les pointeurs des composantes vers les nouveux block
     com[2] = new_cr_block;
     //------------LiBERTEEEEEEEE----------//
     for (uint8_t i = 0; i < vcb; i++) {
@@ -77,12 +76,8 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
 }
 
 
-
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
 
 
 
@@ -108,48 +103,40 @@ umatrice*sur_ech_ver(umatrice*com, infos_comp **infos_img){
     //--------------Allocation de l'espace ---------------//
 
     umatrice new_cb_block ;
-    new_cb_block.data= malloc(vy*sizeof(uint8_t*));
-    umatrice new_cr_block ;
+    new_cb_block.data= malloc(vy*sizeof(uint8_t*));                 // Les hauteurs prennent la valeur de celle Y
+    umatrice new_cr_block ;                              
     new_cr_block.data= malloc(vy*sizeof(uint8_t*));
     for (uint8_t i = 0; i < vy; i++) {
-        new_cb_block.data[i] = malloc(hcb * sizeof(uint8_t));
-        new_cr_block.data[i] = malloc(hcr * sizeof(uint8_t));
+        new_cb_block.data[i] = malloc(hcb * sizeof(uint8_t));       // les largeurs des composantes ne changes pas dans
+        new_cr_block.data[i] = malloc(hcr * sizeof(uint8_t));       // le sur echantillonnage verticale 
     }
-
 
     //--------------remplissage de la mcu---------------//
 
-
                 //----Pour Cb------//
-
-
 
     for (int i =0;i< vcb;i++){
         uint16_t decale=0;
         for (int j = 0 ; j<hcb; j++){
-            decale = facteur_vcb*i;       // pour commencer là oû on est arreter l'iteration precedente
+            decale = facteur_vcb*i;                                 // pour commencer là oû on est arreter dans l'iteration precedente
             for (int k=0 ; k < facteur_vcb; k++){
-                new_cb_block.data[k+decale][j] = cb[i][j];
+                new_cb_block.data[k+decale][j] = cb[i][j];          // On remplit le nouveu block par les valeur dupliqué facteur_vcb fois
             }
         }
     }
-
                  //----Pour Cr------//
-
-
 
     for (int i =0;i< vcb;i++){
         uint16_t decale=0;
         for (int j = 0 ; j<hcr; j++){
-            /*uint16_t valeur = cr[i][j];*/
-            decale = facteur_vcr*i;       // pour commencer là oû on est arreter l'iteration precedente
+            decale = facteur_vcr*i;                                // pour commencer là oû on est arreter dans l'iteration precedente
             for (int k=0 ; k < facteur_vcr; k++){
-                new_cr_block.data[k+decale][j] = cr[i][j];
+                new_cr_block.data[k+decale][j] = cr[i][j];         // On remplit le nouveu block par les valeur dupliqué facteur_vcr fois
             }
         }
     }
 
-    com[1] = new_cb_block;
+    com[1] = new_cb_block;                                         // On point les pointeurs des composantes vers les nouveux block
     com[2] = new_cr_block;
 
     //------------LiBERTEEEEEEEE----------//
@@ -180,12 +167,12 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
 
 
     //--------Cas de sous echantollage verticale----------------//
-    if ( hy==hcb && hy == hcr){
+    if ( vy!=vcb | vy !=vcr){                                     // Si les largeur
         return sur_ech_ver(com, infos_img);
     }
 
     //--------Cas de sous echantollage horizontalle-------------//
-    else if ( vy==vcb && vy == vcr){
+    else if ( hy!=hcb | hy !=hcr){
         return sur_ech_horiz(com, infos_img);
     }
 
