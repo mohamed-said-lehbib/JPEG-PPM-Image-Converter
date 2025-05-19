@@ -186,8 +186,12 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
         temp[1]->h_i=hy;
         temp[2]->h_i=hy;
         umatrice *res=sur_ech_ver(new_com,temp);
+        for (int i = 0; i < 3; i++) {
+            free(temp[i]);
+        }
+        
         return res;
-    
+   
     }
     return com;
 }
