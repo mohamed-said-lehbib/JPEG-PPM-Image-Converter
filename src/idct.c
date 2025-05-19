@@ -3,7 +3,9 @@
 #include <stdint.h>
 #include <math.h>
 
-
+//calculer les constantes utilisées une fois pour to
+//le calcule de ses valeurs a en moyen le même performance que si on l'est définies comme des 
+//static const char
 #define M_PI 3.14159265358979323846
 #define cos6 cos(6*M_PI/16)
 #define sin6 sin(6*M_PI/16)
@@ -13,20 +15,20 @@
 #define cos1 cos(M_PI/16)
 #define sin1 sin(M_PI/16)
 
-double C(uint16_t eps){//calcule de la fonction C 
+double C(uint16_t eps){//calcule de la fonction C,coefficient de normalisation 
     if(eps == 0){
         return 1/sqrt(2);
     }
     return 1;
 }
-uint8_t **iDCT(int16_t **matrice){//nécessite une converion si 8 bits
+uint8_t **iDCT(int16_t **matrice){//iDCT naive
     uint8_t **S = malloc(8*sizeof(uint8_t *));
     for (int i=0;i<8;i++){
         S[i] = malloc(8*sizeof(uint8_t));
     }
    
     
-    for ( int x = 0;x<8;x++){
+    for ( int x = 0;x<8;x++){//itérer pour chaque ligne et colonne pour calculer
         for( int y=0;y<8;y++){
             double Sxy = 0.0;
             for(int lamb=0;lamb<8;lamb++){
@@ -34,19 +36,21 @@ uint8_t **iDCT(int16_t **matrice){//nécessite une converion si 8 bits
                 for(int u=0;u<8;u++){
                     Sxy += temp*
                 C(u)*cos((2*y+1)*u*M_PI/16)*matrice[lamb][u]/4.0f;
+                //c'est côuteux ,à chaque fois on calcule un cosinus
                 }
 
             }
             S[x][y] = (uint8_t) fminf(255.0 , fmaxf(0.0,roundf(Sxy+128.0)));
+            //transformé en uint_8 les valeurs float entre 0 et 255
         }
     }
-    for (int i=0;i<8;i++){
+    for (int i=0;i<8;i++){//libérer la mémoire,notamment la sortie de vecteur zigzag
         free(matrice[i]);
     }
     free(matrice);
     return S;
 }
-void Etape43(float *vect_in){
+void Etape43(float *vect_in){//opérer sur-place
     float vect_out[8];
     vect_out[0] = vect_in[0];
     vect_out[1] = vect_in[4];
@@ -112,10 +116,10 @@ void Etape10(float *vect_in){
         vect_in[i] = vect_out[i];
     }
 }
-uint8_t **iDCT_rap(int16_t **matrice){
+uint8_t **iDCT_rap(int16_t **matrice){//approche factorisé de Lœffer
     
-    float inter[8][8];
-    float res[8][8];
+    float inter[8][8];//vecteur pour appliquer l'inverse DCT à chaque ligne
+    float res[8][8];//vecteur pour appliquer l'inverse DCT à chaque colonne
  
     uint8_t **out = malloc(8*sizeof(uint8_t *));
     for(int i=0;i<8;i++){
@@ -157,10 +161,10 @@ uint8_t **iDCT_rap(int16_t **matrice){
             if (resji<0){resji = 0;}
             if (resji>255){resji = 255;}
             out[i][j] = (uint8_t) fminf(255.0f , fmaxf(0.0,roundf(resji)));
-            
+            //transformé en uint_8 les valeurs double entre 0 et 255
         }
     }
-    for (int j=0;j<8;j++){
+    for (int j=0;j<8;j++){//libérer la mémoire,notamment la sortie de vecteur zigzag
         free(matrice[j]);
     }
     free(matrice);
