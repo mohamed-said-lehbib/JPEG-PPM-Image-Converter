@@ -167,13 +167,13 @@ umatrice *sur_ech(umatrice*com, infos_comp **infos_img){
 
 
     //--------Cas de sous echantollage verticale----------------//
-    if ( (vy!=vcb | vy !=vcr)&&(hy==hcb | hy ==hcr)){                                     // Si les hauteurs sont differentes alors on fait 
-        return sur_ech_ver(com, infos_img);                       // un echantillonnage verticale
+    if ( (vy!=vcb | vy !=vcr)&&(hy==hcb | hy ==hcr)){                   // Si les hauteurs sont differentes alors on fait 
+        return sur_ech_ver(com, infos_img);                             // un echantillonnage verticale
     }
 
     //--------Cas de sous echantollage horizontalle-------------//
-    else if ( (hy!=hcb | hy !=hcr)&&(vy==vcb | vy ==vcr)){                                // Si les largeurs sont differentes alors on fait 
-        return sur_ech_horiz(com, infos_img);                     // un echantillonnage horizontale
+    else if ( (hy!=hcb | hy !=hcr)&&(vy==vcb | vy ==vcr)){              // Si les largeurs sont differentes alors on fait 
+        return sur_ech_horiz(com, infos_img);                           // un echantillonnage horizontale
     }
 
 
