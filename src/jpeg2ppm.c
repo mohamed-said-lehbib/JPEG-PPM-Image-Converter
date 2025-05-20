@@ -57,7 +57,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     uint8_t ac = 0; // nombre de tables ac
-  
+
     uint8_t dc = 0; // nombre de tables dc
     // structure pour souvegarder les données de section SOF
     infos_comp **infos_img = NULL;
@@ -80,33 +80,33 @@ int main(int argc, char **argv)
     while ((byte == 0xff))
     { // while pas de données brutes
         unsigned char flag = fgetc(fptr);
-        if (flag == 0xe0)//récuperer le type de l'image,...
+        if (flag == 0xe0) // récuperer le type de l'image,...
         {
             get_app0(fptr);
         }
-        else if (flag == 0xfe)//commentaire (commentaire)
+        else if (flag == 0xfe) // commentaire (commentaire)
         {
             get_comment(fptr);
         }
         else if (flag == 0xdb) // section DQT,là il y a les tables de quantifictions et leurs indices
         {
-            get_tables_q(fptr, &tables, &tab_q_traite);//modifier la valeur qu'on veut par un pointeur
+            get_tables_q(fptr, &tables, &tab_q_traite); // modifier la valeur qu'on veut par un pointeur
         }
         else if (flag == 0xc4) // section DHT,là où il y a les indices,longuers et symboles correspondants au tablaux de Huffman
         {
             get_huff(fptr, &huff_dc, &huff_ac, &dc, &ac);
         }
-        else if (flag == 0xc0) // section SOF0,on extrait ici les dimensions de l'image,et les tableaux 
-        //les tableaux de quantification correspondante à chaque composante et les facteurs d'échantillonage
+        else if (flag == 0xc0) // section SOF0,on extrait ici les dimensions de l'image,et les tableaux
+        // les tableaux de quantification correspondante à chaque composante et les facteurs d'échantillonage
         {
-            get_sof(fptr, &infos_img, &hauteur, &largeur, &N_comp);//tout stocké dans info_img
+            get_sof(fptr, &infos_img, &hauteur, &largeur, &N_comp); // tout stocké dans info_img
         }
         else if (flag == 0xda) // section SOS,mà on extrait les correspondances entre les tableayx de Huffman
-        //et les composante,et puis on extrait les données brutes
+        // et les composante,et puis on extrait les données brutes
         {
-            get_sos(fptr, &sos_table, &cap, &brutes, &N_brute, &N_comp_sos);//stockage dans sos_table des informations
-            //des composantes
-            //les donnees brutes sont dans brutes
+            get_sos(fptr, &sos_table, &cap, &brutes, &N_brute, &N_comp_sos); // stockage dans sos_table des informations
+            // des composantes
+            // les donnees brutes sont dans brutes
             break;
         }
         else if (flag == 0xd9)
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 
     // extraction des données brutes
     //--------------------------------------------------------------------decodage----------------------------------------------------------------------------------------------------------------------
-    
+
     uint8_t nb_y = (uint8_t)infos_img[0]->h_i * infos_img[0]->v_i;
     uint8_t nb_cb = (uint8_t)(N_comp != 1) ? infos_img[1]->h_i * infos_img[1]->v_i : 0;
     uint8_t nb_cr = (uint8_t)(N_comp != 1) ? infos_img[2]->h_i * infos_img[2]->v_i : 0;
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
     uint16_t nb_mcuy = (((hauteur + 7) / 8) + vy - 1) / vy;
     Huff_arb **arbres_dc = malloc(dc * sizeof(huff_tbl));
     Huff_arb **arbres_ac = malloc(ac * sizeof(huff_tbl));
-    // remplir les arbres db
+    // ramplir les arbres de huffman ( DC)
     for (int i = 0; i < dc; i++)
     {
         Huff_arb *arbre_dc = creer_noeud();
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
         }
         arbres_dc[i] = arbre_dc;
     }
-
+    // ramplir les arbres de huffman ( AC)
     for (int i = 0; i < ac; i++)
     {
         Huff_arb *arbre_ac = creer_noeud();
@@ -177,7 +177,6 @@ int main(int argc, char **argv)
         arbres_ac[i] = arbre_ac;
     }
     uint8_t *huff_corr_dc = malloc(N_comp * sizeof(uint8_t)); // table de huffman correspondant dc
-
     uint8_t *huff_corr_ac = malloc(N_comp * sizeof(uint8_t));
     for (int i = 0; i < N_comp; i++)
     {
@@ -193,15 +192,19 @@ int main(int argc, char **argv)
     }
 
     uint16_t nb[3] = {nb_y, nb_cb, nb_cr}; // nombre de composant par mcu
-    printf(" hello %d , %d , %d ,% d, %d", nb[0], nb_cb, nb_cr, nb_mcux, nb_mcuy);
-    printf(" %d, %d, %d\n", nb_mcux * nb_mcuy, hy, vy);
-    printf(" \nhi\n");
-
     BitStream bs;
-    create_bitstream(&bs, brutes, N_brute);
+    create_bitstream(&bs, brutes, N_brute); // transformation de la donnee brute en flux de bits
+
+    //   -------------------------------------*********************-------------------------------------------------//
+    //   --------------------------------------Decodage de Huffman----------------------------------------------------//
+    //   -------------------------------------*********************-------------------------------------------------//
+
     MCU *mcus = decode_huff_image(arbres_dc, arbres_ac, &bs, nb_mcux, nb_mcuy, N_comp, huff_corr_dc, huff_corr_ac, nb);
 
-    //   ------------------------------------Quantification inverse ----------------------------------------
+    //   ------------------------------------**********************-------------------------------------------------//
+    //   ------------------------------------Quantification inverse----- -------------------------------------------//
+    //   ------------------------------------**********************-------------------------------------------------//
+
     uint8_t *qt_corr = malloc(N_comp * sizeof(uint8_t));
     for (int i = 0; i < N_comp; i++)
     {
@@ -217,8 +220,11 @@ int main(int argc, char **argv)
             }
         }
     }
-                                           
-    //--------------------------------Allocation de la memoire -----------------------------------//
+
+    //   ------------------------------------**********************-------------------------------------------------//
+    //   -----------------------------Allocation de la memoire pour les donnes apres l'idct-------------------------//
+    //   ------------------------------------**********************-------------------------------------------------//
+
     umatrice ***idct = malloc(nb_mcuy * sizeof(umatrice **));
     for (uint32_t i = 0; i < nb_mcuy; i++)
     {
@@ -237,8 +243,12 @@ int main(int argc, char **argv)
         }
     }
 
-    //------------------------------------------------------IDCT & IZIGZAG----------------------------------
+    //   ------------------------------------**********************-------------------------------------------------//
+    //   ----------------------------------------IDCT && IZIGZAG----------------------------------------------------//
+    //   ------------------------------------**********************-------------------------------------------------//
 
+    /* On parcour tout les MCU puis les composantes et pour chaque composante on applique le zigzag */
+    
     for (uint32_t i = 0; i < nb_mcux * nb_mcuy; i++)
     {
         for (int j = 0; j < N_comp; j++)
@@ -259,58 +269,76 @@ int main(int argc, char **argv)
                     for (int m = 0; m < 8; m++)
                     {
                         idct[i / nb_mcux][i % nb_mcux][j].data[l + decaley][m + decalex] = idc.data[l][m];
-
                     }
                     free(idc.data[l]);
-                
                 }
                 free(idc.data);
-                
+
                 decalex += 8;
             }
         }
     }
 
-    //----------------------------------- Sur echantillonage----------------------------------------------------//
+    //   ------------------------------------**********************-------------------------------------------------//
+    //   -----------------------------Sur echantillonnage et ecriture en ppm----------------------------------------//
+    //   ------------------------------------**********************-------------------------------------------------//
 
-    if (N_comp == 1)
+    if (N_comp == 1) // Si on a une seul composante on ecrit en pgm (niveau de gris)
     {
 
-        transf_pgm(idct, "pppp", largeur, hauteur);
+        transf_pgm(idct, "invader.pgm", largeur, hauteur);
     }
+
+    /*Sinon on a trois composantes donc on applique un surechantillonnage si besoin.
+      En suite, pour chaque MCU on applique la fonction YCbCr2RGB on stock le resultat
+      dans la matrice image pour ecrire à la fin dans le fichier ppm*/
+
     else
     {
-        for (uint32_t i = 0; i < nb_mcuy; i++){
-            for (uint32_t j = 0; j < nb_mcux; j++){
+        for (uint32_t i = 0; i < nb_mcuy; i++)
+        {
+            for (uint32_t j = 0; j < nb_mcux; j++)
+            {
                 idct[i][j] = sur_ech(idct[i][j], infos_img);
             }
         }
         uint32_t **image;
         image = malloc(hauteur * sizeof(uint32_t *));
-        for (uint32_t i = 0; i < hauteur; i++){
+        for (uint32_t i = 0; i < hauteur; i++)
+        {
             image[i] = malloc(largeur * sizeof(uint32_t));
         }
-        for (uint32_t i = 0; i < nb_mcuy; i++){
-            for (uint32_t j = 0; j < nb_mcux; j++){
+        for (uint32_t i = 0; i < nb_mcuy; i++)
+        {
+            for (uint32_t j = 0; j < nb_mcux; j++)
+            {
                 uint32_t **new = YCbCr2RGB(idct[i][j], hy, vy);
-                for (uint32_t k = 0; k < vy * 8; k++){
-                    for (uint32_t l = 0; l < hy * 8; l++){
-                        if (i * vy * 8 + k < hauteur && j * hy * 8 + l < largeur){
+                for (uint32_t k = 0; k < vy * 8; k++)
+                {
+                    for (uint32_t l = 0; l < hy * 8; l++)
+                    {
+                        if (i * vy * 8 + k < hauteur && j * hy * 8 + l < largeur)
+                        {
                             image[i * vy * 8 + k][j * hy * 8 + l] = new[k][l];
                         }
                     }
-                free (new[k]);
+                    free(new[k]);
                 }
-                free (new);
+                free(new);
             }
         }
-        transf_ppm(image,"iiii.ppm", largeur, hauteur);
-        for (uint32_t i=0 ; i<hauteur;i++){
+        transf_ppm(image, "iiii.ppm", largeur, hauteur);
+        for (uint32_t i = 0; i < hauteur; i++)
+        {
             free(image[i]);
         }
         free(image);
     }
-    //---------------------------FIN--------------------------------------------------------------
+
+    //   ------------------------------------**********************-------------------------------------------------//
+    //   -----------------------------------Liberation de la mémoire------------------------------------------------//
+    //   ------------------------------------**********************-------------------------------------------------//
+
     fclose(fptr);
 
     for (int u = 0; u < tab_q_traite; u++)
@@ -358,10 +386,6 @@ int main(int argc, char **argv)
     free(huff_corr_ac);
     free(huff_corr_dc);
 
-
-
-
-
     for (uint32_t i = 0; i < dc; i++)
     {
         free_arbre(arbres_dc[i]);
@@ -378,11 +402,14 @@ int main(int argc, char **argv)
         free(mcus[i].comps);
     }
     free(mcus);
-
-    for (uint32_t i = 0; i < nb_mcuy; i++) {
-        for (uint32_t j = 0; j < nb_mcux; j++) {
-            for (int k = 0; k < N_comp; k++) {
-                for (uint32_t l = 0; l < vy * 8; l++) {
+    for (uint32_t i = 0; i < nb_mcuy; i++)
+    {
+        for (uint32_t j = 0; j < nb_mcux; j++)
+        {
+            for (int k = 0; k < N_comp; k++)
+            {
+                for (uint32_t l = 0; l < vy * 8; l++)
+                {
                     free(idct[i][j][k].data[l]);
                 }
                 free(idct[i][j][k].data);
@@ -392,12 +419,5 @@ int main(int argc, char **argv)
         free(idct[i]);
     }
     free(idct);
-
-    //-------------image--------------//
- 
-
-
-
-
     return 0;
 }
