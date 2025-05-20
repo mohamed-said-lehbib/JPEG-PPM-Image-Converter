@@ -285,8 +285,23 @@ int main(int argc, char **argv)
 
     if (N_comp == 1) // Si on a une seul composante on ecrit en pgm (niveau de gris)
     {
+        char out_nom[256];//nom de l'output
+        const char *fich_pt = strrchr(argv[1],'/');//finir au dernier /
+        fich_pt++;
+        snprintf(out_nom,256,"images/");//copier au début images/
 
-        transf_pgm(idct, "invader.pgm", largeur, hauteur);
+        char nom_im[256];//juste le nom
+        strncpy(nom_im,fich_pt,sizeof(nom_im));//copier le string dans nom_im
+        
+        nom_im[255] = '\0';
+        char *extension = strrchr(nom_im,'.');//supprimer la section aprés .j...
+        *extension = '\0';
+
+        //images/ +nom_im + .pgm
+        strncat(out_nom,nom_im,255 - strlen(out_nom));
+        strncat(out_nom,".pgm",255 - strlen(out_nom));
+
+        transf_pgm(idct, out_nom, largeur, hauteur);
     }
 
     /*Sinon on a trois composantes donc on applique un surechantillonnage si besoin.
@@ -327,7 +342,23 @@ int main(int argc, char **argv)
                 free(new);
             }
         }
-        transf_ppm(image, "iiii.ppm", largeur, hauteur);
+        char out_nom[256];
+        const char *fich_pt = strrchr(argv[1],'/');//finir au dernier /
+        fich_pt++;
+        snprintf(out_nom,256,"images/");//avoir image dans out
+
+        char nom_im[256];
+        strncpy(nom_im,fich_pt,sizeof(nom_im));//copier le string fich_pt dans nom_im
+        
+        nom_im[255] = '\0';
+        char *extension = strrchr(nom_im,'.');//supprimer la section aprés .j...
+        *extension = '\0';
+
+        // images/ + nom_im + .ppm
+        strncat(out_nom,nom_im,255 - strlen(out_nom));
+        strncat(out_nom,".ppm",255 - strlen(out_nom));
+
+        transf_ppm(image,out_nom , largeur, hauteur);
         for (uint32_t i = 0; i < hauteur; i++)
         {
             free(image[i]);
@@ -419,5 +450,6 @@ int main(int argc, char **argv)
         free(idct[i]);
     }
     free(idct);
+    
     return 0;
 }
