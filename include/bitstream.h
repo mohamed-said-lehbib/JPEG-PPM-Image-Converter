@@ -13,11 +13,6 @@ typedef struct {
 
 
 BitStream create_bitstream(BitStream *bs, uint8_t *data, int size);
-
-
-int read_bit(BitStream *bs);
-
-
 int read_bits(BitStream *bs, int n);
 
 #endif
