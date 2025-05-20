@@ -14,9 +14,11 @@ Huff_arb *creer_noeud() {
     noeud->fd = NULL;// fils droit
     return noeud;
 }
-// decode_bloc : elle prend en parametre l'arbre de decodage dc et ac, le flux de bits et la taille du bloc
-// elle parcourt le flux de bits et decode les coefficients DC et AC , des qu'elle remplis un un vecteur de 64 coefficients, elle l'ajoute dans le tableau de blocs
-// et elle passe au vecteur suivant
+/* @brief decode_huff_image elle parcourt le flux de bits et decode les coefficients DC et AC , des qu'elle remplis un un vecteur de 64 coefficients, elle l'ajoute dans le tableau de blocs
+ et elle passe au vecteur suivant
+   @return renvoie le tableau de mcus decodes
+ */
+
  MCU *decode_huff_image(Huff_arb **arbre_dc, Huff_arb **arbre_ac, BitStream *bs,uint16_t nb_mcux,uint16_t nb_mcuy, uint8_t N_comp,
     uint8_t *huff_corr_dc,uint8_t *huff_corr_ac , uint16_t nb[]) {
     MCU *mcus = malloc(nb_mcux*nb_mcuy* sizeof(MCU));//allocation de la memoire pour le tableau de blocs
@@ -29,27 +31,27 @@ Huff_arb *creer_noeud() {
             mcus[i].comps[j].nb_bloc = nb[j];  
         }
     }
-    uint32_t blo_idx = 0;
-    int16_t temp[3] = {0,0,0};
-    while (blo_idx < nb_mcux*nb_mcuy ) {// tant qu'on a pas consomme le flux de bits*
-        //printf( " nouveau bloc %d", blo_idx);
+    uint32_t mcu_idx  = 0;
+    int16_t dc_init[3] = {0,0,0};
+    while (mcu_idx  < nb_mcux*nb_mcuy ) {// tant qu'on a pas consomme le flux de bits*
+        //printf( " nouveau bloc %d", mcu_idx );
 
         for ( int comp = 0 ; comp < N_comp ; comp++){  
             uint8_t idx_table_dc=huff_corr_dc[(comp==0)?0:1];
             uint8_t idx_table_ac=huff_corr_ac[(comp==0)?0:1];
-            for ( int k=0 ; k<mcus[blo_idx].comps[comp].nb_bloc;k++){
-                mcus[blo_idx].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], temp[comp], bs);
-                temp[comp]=mcus[blo_idx].comps[comp].blocs[k].data[0];
+            for ( int k=0 ; k<mcus[mcu_idx ].comps[comp].nb_bloc;k++){
+                mcus[mcu_idx ].comps[comp].blocs[k].data[0]= decode_dc(arbre_dc[idx_table_dc], dc_init[comp], bs);
+                dc_init[comp]=mcus[mcu_idx ].comps[comp].blocs[k].data[0];
 
                 int *coeffs_ac = decode_all_ac(arbre_ac[idx_table_ac], bs);// decodage des coefficients ac ( return 63 coefficients)
                 for (int j = 1; j < 64; j++) {
-                    mcus[blo_idx].comps[comp].blocs[k].data[j] = coeffs_ac[j-1];
+                    mcus[mcu_idx ].comps[comp].blocs[k].data[j] = coeffs_ac[j-1];
                 }
                 free(coeffs_ac);
                 
                     }}
         
-        blo_idx++;
+        mcu_idx ++;
         }
        
        
@@ -60,10 +62,12 @@ Huff_arb *creer_noeud() {
 
     }
 
+/*
+   @brief inserer_code : elle prend en parametre l'arbre de decodage, le code, le symbole et la longueur du code
+   elle insere le code dans l'arbre de decodage en suivant le chemin de la racine vers la feuille
+   elle cree un noeud pour chaque bit du code et elle stocke le symbole dans la feuille
 
-// insert_code : elle prend en parametre l'arbre de decodage, le code, le symbole et la longueur du code
-// elle insere le code dans l'arbre de decodage en suivant le chemin de la racine vers la feuille
-// elle cree un noeud pour chaque bit du code et elle stocke le symbole dans la feuille
+*/
 void inserer_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t longueur) {
     Huff_arb *courrent = arbre; 
     for (int i = longueur - 1; i >= 0; i--) {
@@ -80,9 +84,10 @@ void inserer_code(Huff_arb *arbre, uint16_t code, uint8_t symbole, uint16_t long
     courrent->est_mot_de_code = 1;// on a atteint une feuille , donc on passe a 1 
     courrent->symbole = symbole;// on stocke le symbole dans la feuille
 }
-// afficher_arbre : elle prend en parametre l'arbre de decodage
-// elle affiche l'arbre de decodage d'une maniere recursive
-// elle nous etait utile pour deboguer l'arbre de decodage
+/* afficher_arbre : elle prend en parametre l'arbre de decodage
+   elle affiche l'arbre de decodage d'une maniere recursive
+   elle nous etait utile pour deboguer l'arbre de decodage
+*/
 void afficher_arbre(Huff_arb *arbre) {
     if (arbre == NULL) return;// si l'arbre est vide, on ne fait rien
 
