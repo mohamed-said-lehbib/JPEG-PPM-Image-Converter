@@ -1,11 +1,14 @@
 ## Notre décodeur JPEG à nous 
+Ce projet a pour objectif de construire un décodeur JPEG capable de lire une image compressée 
+en format `.jpg` et de générer en sortie une image affichable au format `.ppm` ou `.pgm`. 
+Il est développé en langage C.
 
 
 ## Membres de groupe :
 
 ### J'meili Makhtour
 ### Bensalem Abdellah
-### Mohamed said lehbib 
+### lehbib Mohamed said
 
 ## ️ Fonctionnalités implémentées et division des tâches
 
@@ -20,6 +23,11 @@
 | Conversion YCbCr → RGB                                   | Mohamed Said         |
 | Upsampling                                               | Mohamed Said         |
 | Génération d’un fichier image `.ppm` ou `.pgm`           | Mohamed Said         |
+
+## Démarche de développement
+Nous avons adopté une approche incrémentale et progressive. Tout au long du projet, nous avons 
+été amenés à ajuster et modifier de nombreux éléments au fur et à mesure de nos avancées.
+Chaque étape nous a permis de mieux comprendre le format JPEG et d'améliorer progressivement notre décodeur.
 
 ## Images de test prises sur le web 
 
@@ -38,5 +46,9 @@ ajustements, notre organisation s’est améliorée et le projet a bien avancé.
 On a passé près de deux jours à obtenir des images correctes mais mal colorées. En fait, l’erreur
 était minime : on ne gérait pas correctement le coefficient DC initial dans le cas des images colorées.
 
-
+## Compétences acquises
+Ce projet nous a permis de développer plusieurs compétences techniques : compréhension du format JPEG, manipulation de bits, gestion de la mémoire en C, et mise en œuvre d’algorithmes de décodage.
+Mais surtout, c’était notre premier vrai travail collectif, où nous avons ressenti l’esprit d’équipe, relevé
+ensemble des défis, et appris à nous organiser efficacement. Ce projet a marqué une étape importante pour nous, car il nous a permis de vivre des moments inoubliables tout en progressant 
+à la fois en autonomie et en collaboration.
 
