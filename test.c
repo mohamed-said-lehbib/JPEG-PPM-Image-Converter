@@ -4,7 +4,7 @@
 #include "./include/izigzag.h"
 #include "./include/idct.h"
 #include "./include/decodage_huffman.h"
-#include "./include/structs.h"
+
 #include <string.h>
 #include "./include/quant_inverse.h"
 #include "./include/YCbCr2RGB.h"
