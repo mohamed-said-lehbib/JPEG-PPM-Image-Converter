@@ -21,7 +21,7 @@
 | Upsampling                                               | Mohamed Said         |
 | Génération d’un fichier image `.ppm` ou `.pgm`           | Mohamed Said         |
 
-##Images de test prises sur le web 
+## Images de test prises sur le web 
 
 
 
@@ -30,7 +30,7 @@
 
 Nous avons eu des difficultés, surtout au début, avec l’idée de départ du décodage Huffman, qui demande 
 un traitement précis des bits. Par la suite, la gestion de l’upsampling a aussi posé problème.
-En plus, la coordination de toutes les tâches pour décoder la première image (Invaders) a été compliquée. Après plusieurs 
+En plus, la coordination de toutes les tâches pour décoder la première image (Invaders) a été un peu compliquée. Après plusieurs 
 ajustements, notre organisation s’est améliorée et le projet a bien avancé.
 
 
