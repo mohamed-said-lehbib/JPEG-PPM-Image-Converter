@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         {
             get_app0(fptr);
         }
-        else if (flag == 0xfe) // commentaire (commentaire)
+        else if (flag == 0xfe) // section d'un commentaire,à ignorer
         {
             get_comment(fptr);
         }
@@ -205,11 +205,7 @@ int main(int argc, char **argv)
     //   ------------------------------------Quantification inverse----- -------------------------------------------//
     //   ------------------------------------**********************-------------------------------------------------//
 
-    uint8_t *qt_corr = malloc(N_comp * sizeof(uint8_t));
-    for (int i = 0; i < N_comp; i++)
-    {
-        qt_corr[i] = infos_img[i]->i_q;
-    }
+  
     for (int i = 0; i < nb_mcux * nb_mcuy; i++)
     {
         for (int j = 0; j < N_comp; j++)
@@ -413,7 +409,7 @@ int main(int argc, char **argv)
     free(sos_table);
 
     free(brutes);
-    free(qt_corr);
+  
     free(huff_corr_ac);
     free(huff_corr_dc);
 
