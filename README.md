@@ -4,6 +4,7 @@ en format `.jpg` et de générer en sortie une image affichable au format `.ppm`
 Il est développé en langage C.
 
 
+
 ## Membres de groupe :
 
 ### J'meili Makhtour
@@ -29,9 +30,8 @@ Nous avons adopté une approche incrémentale et progressive. Tout au long du pr
 été amenés à ajuster et modifier de nombreux éléments au fur et à mesure de nos avancées.
 Chaque étape nous a permis de mieux comprendre le format JPEG et d'améliorer progressivement notre décodeur.
 
-## Images de test prises sur le web 
-
-
+## Image de test prises sur le web 
+![](images/ensimag.jpeg)
 
 
 ## Problèmes rencontrés 
