@@ -54,7 +54,7 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
                 //----Pour Cb------//
 
     for (int i =0;i< vcb;i++){
-        uint16_t decale=0;
+        uint8_t decale=0;
         for (int j = 0 ; j<hcb; j++){
             decale = facteur_hcb*j;                         // pour commencer là oû on est arreter dans l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
@@ -69,7 +69,7 @@ umatrice *sur_ech_horiz(umatrice*com, infos_comp **infos_img){
        qui indique là oû on va commancer pour la prochaine iteration */
 
     for (int i =0;i< vcr;i++){
-        uint16_t decale=0;
+        uint8_t decale=0;
         for (int j = 0 ; j<hcr; j++){
             decale = facteur_hcr*j;                         // pour commencer là oû on est arreter l'iteration precedente
             for (int k=0 ; k < facteur_hcb; k++){
